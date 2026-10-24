@@ -1,6 +1,6 @@
 // 題庫：中文一律以繁體撰寫，簡體由 OpenCC 即時轉換。
 // en = 標準答案（顯示用）；alt = 其他也算對的說法。
-// 每個 Level 3 個情境主題，每主題 12 句，難度由短到長。
+// Level 1–4 各 3 個情境主題、Level 5 有 8 個，每主題 12 句，難度由短到長。
 window.LEVELS = [
   {
     id: 1, name: "入門", en: "Starter", color: "coral",
@@ -232,7 +232,7 @@ window.LEVELS = [
   },
   {
     id: 5, name: "高級", en: "Advanced", color: "purple",
-    desc: "商務談判、簡報、辯論表達",
+    desc: "談判簡報、慣用語、新聞、金融、學術、外交辭令",
     topics: [
       {
         id: "5-1", name: "商務談判", en: "Negotiation",
@@ -283,6 +283,91 @@ window.LEVELS = [
           { zh: "科技讓我們更方便，但也讓我們更孤立。", en: "Technology makes life more convenient, but it also makes us more isolated.", alt: ["Technology makes our lives more convenient, but it also makes us more isolated."] },
           { zh: "這個問題的根源在於教育。", en: "The root of this problem lies in education.", alt: ["The root cause of this problem is education."] },
           { zh: "與其抱怨，不如想辦法解決。", en: "Instead of complaining, we should find a way to solve it.", alt: ["Rather than complaining, we should try to solve the problem."] }
+        ]
+      },
+      {
+        id: "5-4", name: "道地慣用語", en: "Idioms",
+        items: [
+          { zh: "我們先別急著下結論。（用 jump）", en: "Let's not jump to conclusions.", alt: ["Let's not jump to any conclusions.", "We shouldn't jump to conclusions."] },
+          { zh: "這個我們晚點再回頭討論。（用 circle back）", en: "Let's circle back to this later.", alt: ["Let's circle back on this later.", "We'll circle back to this later."] },
+          { zh: "這只是個粗略的估計。（用 ballpark）", en: "This is just a ballpark figure.", alt: ["It's just a ballpark figure.", "This is just a ballpark estimate.", "It's only a ballpark figure.", "It's just a ballpark estimate."] },
+          { zh: "別擔心，這件事很容易。（用 piece of cake）", en: "Don't worry, it's a piece of cake.", alt: ["Don't worry, this is a piece of cake."] },
+          { zh: "我們開始談正事吧。（用 down to business）", en: "Let's get down to business.", alt: ["We need to get down to business.", "We have to get down to business."] },
+          { zh: "他的報告完全沒抓到重點。（用 miss the point）", en: "His report completely missed the point.", alt: ["His report totally missed the point.", "His report missed the point entirely.", "His report missed the point completely."] },
+          { zh: "這個計畫因為缺乏資金而被擱置了。（用 put on hold）", en: "The project was put on hold due to a lack of funding.", alt: ["The project was put on hold because of a lack of funding.", "The project has been put on hold due to a lack of funding.", "The project was put on hold due to lack of funding.", "The plan was put on hold due to a lack of funds."] },
+          { zh: "光靠一份薪水，他們很難維持生計。（用 make ends meet）", en: "They struggle to make ends meet on one salary.", alt: ["It's hard for them to make ends meet on one salary.", "They struggle to make ends meet on a single salary.", "They can barely make ends meet on one salary.", "It's difficult for them to make ends meet on a single income."] },
+          { zh: "他終於鼓起勇氣坦白一切。（用 come clean）", en: "He finally plucked up the courage to come clean.", alt: ["He finally worked up the courage to come clean.", "He finally found the courage to come clean.", "He finally got up the courage to come clean.", "He finally summoned the courage to come clean.", "He finally mustered the courage to come clean."] },
+          { zh: "這次失敗結果反而是因禍得福。（用 blessing in disguise）", en: "This failure turned out to be a blessing in disguise.", alt: ["The failure turned out to be a blessing in disguise.", "This failure was actually a blessing in disguise.", "The failure was a blessing in disguise."] },
+          { zh: "不能再拖了，我們必須硬著頭皮做決定。（用 bite the bullet）", en: "We can't put it off any longer; we have to bite the bullet.", alt: ["We can't put it off any longer. We need to bite the bullet.", "We can't delay any longer; we have to bite the bullet.", "We can't wait any longer. We have to bite the bullet."] },
+          { zh: "我們再檢查一次吧，小心駛得萬年船。（用 better safe than sorry）", en: "Let's check it again. Better safe than sorry.", alt: ["Let's double-check it. Better safe than sorry.", "Let's double-check. Better safe than sorry.", "Let's check it one more time. Better safe than sorry.", "Let's check again. Better safe than sorry."] }
+        ]
+      },
+      {
+        id: "5-5", name: "新聞時事", en: "News & Current Affairs",
+        items: [
+          { zh: "失業率創下十年來新低。", en: "The unemployment rate has hit a ten-year low.", alt: ["The unemployment rate hit a ten-year low.", "Unemployment has hit a ten-year low.", "The unemployment rate has fallen to a ten-year low."] },
+          { zh: "政府宣布了一系列抑制通膨的新措施。", en: "The government has announced a series of new measures to curb inflation.", alt: ["The government announced a series of new measures to curb inflation.", "The government has announced a series of new measures to fight inflation.", "The government announced a series of new measures to rein in inflation."] },
+          { zh: "這項法案在國會引發了激烈的辯論。", en: "The bill sparked a heated debate in Congress.", alt: ["The bill has sparked a heated debate in Congress.", "The bill sparked a heated debate in parliament.", "The bill triggered a fierce debate in Congress.", "The bill sparked a heated debate in the legislature."] },
+          { zh: "據報導，雙方已同意停火。", en: "Both sides have reportedly agreed to a ceasefire.", alt: ["Reportedly, both sides have agreed to a ceasefire.", "According to reports, both sides have agreed to a ceasefire.", "It is reported that both sides have agreed to a ceasefire.", "The two sides have reportedly agreed to a ceasefire."] },
+          { zh: "專家警告，極端天氣將變得越來越頻繁。", en: "Experts warn that extreme weather will become increasingly frequent.", alt: ["Experts warn that extreme weather will become more and more frequent.", "Experts have warned that extreme weather will become increasingly frequent.", "Experts warn that extreme weather events will become increasingly frequent."] },
+          { zh: "這起醜聞嚴重損害了公司的聲譽。", en: "The scandal has seriously damaged the company's reputation.", alt: ["The scandal seriously damaged the company's reputation.", "The scandal has severely damaged the company's reputation.", "The scandal has done serious damage to the company's reputation."] },
+          { zh: "調查仍在進行中，細節尚未公布。", en: "The investigation is still ongoing, and the details have yet to be released.", alt: ["The investigation is still ongoing and details have not yet been released.", "The investigation is still underway, and the details have not been released yet.", "The investigation is ongoing, and details have yet to be released."] },
+          { zh: "這項政策的長期影響仍有待觀察。", en: "The long-term impact of this policy remains to be seen.", alt: ["The long-term effects of this policy remain to be seen.", "The long-term impact of the policy remains to be seen.", "The long-term effects of the policy remain to be seen."] },
+          { zh: "抗議者聚集在市政府外，要求市長下台。", en: "Protesters gathered outside City Hall, demanding the mayor's resignation.", alt: ["Protesters gathered outside City Hall, demanding that the mayor resign.", "Protesters gathered outside City Hall to demand the mayor's resignation.", "Protesters gathered outside City Hall, calling for the mayor to step down.", "Protesters gathered outside City Hall, demanding the mayor step down."] },
+          { zh: "儘管經濟放緩，消費者信心依然強勁。", en: "Despite the economic slowdown, consumer confidence remains strong.", alt: ["Consumer confidence remains strong despite the economic slowdown.", "Despite the slowdown in the economy, consumer confidence remains strong.", "Despite the economic slowdown, consumer confidence is still strong."] },
+          { zh: "該公司否認所有指控，並表示將採取法律行動。", en: "The company denied all the allegations and said it would take legal action.", alt: ["The company denied all allegations and said it would take legal action.", "The company has denied all the allegations and says it will take legal action.", "The company has denied all allegations and said it will take legal action."] },
+          { zh: "這場危機暴露了醫療體系長期存在的缺陷。", en: "The crisis has exposed long-standing flaws in the healthcare system.", alt: ["The crisis exposed long-standing flaws in the healthcare system.", "The crisis has exposed longstanding flaws in the healthcare system.", "The crisis has exposed long-standing flaws in the health care system.", "The crisis has exposed long-standing weaknesses in the healthcare system."] }
+        ]
+      },
+      {
+        id: "5-6", name: "經濟金融", en: "Economics & Finance",
+        items: [
+          { zh: "央行決定維持利率不變。", en: "The central bank decided to keep interest rates unchanged.", alt: ["The central bank has decided to keep interest rates unchanged.", "The central bank decided to leave interest rates unchanged.", "The central bank decided to hold interest rates steady."] },
+          { zh: "我們不應該把所有雞蛋放在同一個籃子裡。", en: "We shouldn't put all our eggs in one basket.", alt: ["We shouldn't put all of our eggs in one basket.", "We shouldn't put all our eggs in the same basket."] },
+          { zh: "分散投資可以降低整體風險。", en: "Diversification can reduce overall risk.", alt: ["Diversifying your investments can reduce overall risk.", "Diversifying investments can reduce the overall risk.", "Diversification can lower overall risk."] },
+          { zh: "通膨侵蝕了一般家庭的購買力。", en: "Inflation has eroded the purchasing power of ordinary households.", alt: ["Inflation eroded the purchasing power of ordinary households.", "Inflation has eroded ordinary households' purchasing power.", "Inflation has eaten into the purchasing power of ordinary households.", "Inflation has eroded the purchasing power of ordinary families."] },
+          { zh: "消息一公布，股市就應聲下跌。", en: "The stock market fell as soon as the news broke.", alt: ["Stocks fell as soon as the news broke.", "The stock market dropped as soon as the news was announced.", "The stock market fell as soon as the news was announced."] },
+          { zh: "這家新創公司在最近一輪融資中募得五千萬美元。", en: "The startup raised $50 million in its latest funding round.", alt: ["The startup raised fifty million dollars in its latest funding round.", "The startup raised $50 million in its latest round of funding.", "The startup raised 50 million dollars in its latest funding round.", "The start-up raised $50 million in its latest funding round.", "The startup raised $50 million in its most recent funding round."] },
+          { zh: "供應鏈中斷推高了生產成本。", en: "Supply chain disruptions have driven up production costs.", alt: ["Supply chain disruptions have pushed up production costs.", "Supply chain disruptions drove up production costs.", "Disruptions in the supply chain have driven up production costs."] },
+          { zh: "高槓桿的投資策略風險極高。", en: "Highly leveraged investment strategies are extremely risky.", alt: ["A highly leveraged investment strategy is extremely risky.", "Highly leveraged investment strategies carry extremely high risk."] },
+          { zh: "這家公司的現金流不足以償還債務。", en: "The company's cash flow is insufficient to repay its debts.", alt: ["The company's cash flow is not enough to repay its debts.", "The company doesn't have enough cash flow to pay off its debts.", "The company's cash flow is insufficient to repay its debt.", "The company's cash flow is insufficient to service its debt."] },
+          { zh: "經濟學家預測明年將出現溫和的衰退。", en: "Economists predict a mild recession next year.", alt: ["Economists are predicting a mild recession next year.", "Economists forecast a mild recession next year.", "Economists predict that there will be a mild recession next year."] },
+          { zh: "貨幣貶值雖然有利出口，卻會推高進口成本。", en: "Although currency depreciation benefits exports, it drives up the cost of imports.", alt: ["Although currency depreciation helps exports, it raises the cost of imports.", "While currency depreciation benefits exports, it pushes up import costs.", "Currency depreciation benefits exports, but it drives up the cost of imports.", "Although a weaker currency benefits exports, it raises the cost of imports."] },
+          { zh: "要不是政府及時介入，整個金融體系可能早就崩潰了。", en: "Had the government not intervened in time, the entire financial system might have collapsed.", alt: ["If the government hadn't intervened in time, the entire financial system might have collapsed.", "If the government had not stepped in in time, the whole financial system could have collapsed.", "Had the government not stepped in in time, the entire financial system might have collapsed.", "If it hadn't been for the government's timely intervention, the whole financial system might have collapsed."] }
+        ]
+      },
+      {
+        id: "5-7", name: "學術研究", en: "Academic English",
+        items: [
+          { zh: "相關性並不代表因果關係。", en: "Correlation does not imply causation.", alt: ["Correlation is not causation.", "Correlation does not equal causation.", "Correlation doesn't mean causation."] },
+          { zh: "這項發現與先前的研究結果一致。", en: "This finding is consistent with previous research.", alt: ["This finding is consistent with the results of previous studies.", "This finding is in line with previous research.", "These findings are consistent with previous research."] },
+          { zh: "樣本數太小，無法得出明確的結論。", en: "The sample size is too small to draw definitive conclusions.", alt: ["The sample size is too small to draw any definitive conclusions.", "The sample is too small to draw firm conclusions.", "The sample size is too small to draw clear conclusions."] },
+          { zh: "本研究旨在探討社群媒體對青少年心理健康的影響。", en: "This study aims to examine the impact of social media on adolescents' mental health.", alt: ["This study aims to examine the impact of social media on the mental health of adolescents.", "This study aims to explore the effects of social media on teenagers' mental health.", "The aim of this study is to examine the impact of social media on adolescent mental health.", "This study aims to investigate the impact of social media on adolescents' mental health."] },
+          { zh: "我們需要控制其他可能的干擾變項。", en: "We need to control for other potential confounding variables.", alt: ["We need to control for other possible confounding variables.", "We need to control for other potential confounders."] },
+          { zh: "這個理論在學術界仍極具爭議。", en: "The theory remains highly controversial in academia.", alt: ["This theory remains highly controversial in academia.", "The theory is still highly controversial in academia.", "The theory remains highly controversial in the academic world."] },
+          { zh: "這篇論文的研究方法有幾個明顯的缺陷。", en: "The paper's methodology has several obvious flaws.", alt: ["There are several obvious flaws in the paper's methodology.", "The methodology of this paper has several obvious flaws.", "The paper's methodology has several clear flaws."] },
+          { zh: "本研究的局限性將於下一節討論。", en: "The limitations of this study will be discussed in the next section.", alt: ["The limitations of this study are discussed in the next section.", "The limitations of this study will be discussed in the following section.", "This study's limitations will be discussed in the next section."] },
+          { zh: "這些數據顯示兩者之間存在顯著的正相關。", en: "The data show a significant positive correlation between the two.", alt: ["The data shows a significant positive correlation between the two.", "These data show a significant positive correlation between the two.", "The data indicate a significant positive correlation between the two."] },
+          { zh: "換言之，這個假設並未獲得實證支持。", en: "In other words, the hypothesis is not supported by empirical evidence.", alt: ["In other words, this hypothesis is not supported by empirical evidence.", "In other words, the hypothesis lacks empirical support.", "In other words, the hypothesis has not been empirically supported."] },
+          { zh: "未來的研究應納入更多元的樣本。", en: "Future research should include a more diverse sample.", alt: ["Future research should include more diverse samples.", "Future studies should include a more diverse sample.", "Future studies should include more diverse samples."] },
+          { zh: "若將文化因素納入考量，結果可能會截然不同。", en: "If cultural factors were taken into account, the results might be completely different.", alt: ["If cultural factors are taken into account, the results may be completely different.", "If cultural factors were taken into consideration, the results might be completely different.", "If we took cultural factors into account, the results might be entirely different.", "If cultural factors were taken into account, the results could be entirely different."] }
+        ]
+      },
+      {
+        id: "5-8", name: "外交辭令", en: "Diplomatic Language",
+        items: [
+          { zh: "我們對此深表關切。", en: "We are deeply concerned about this.", alt: ["We're deeply concerned about this.", "We are gravely concerned about this.", "We have serious concerns about this."] },
+          { zh: "這或許不是最理想的時機。", en: "This may not be the ideal time.", alt: ["This might not be the ideal time.", "This may not be the best time.", "Perhaps this isn't the ideal time.", "This may not be the ideal timing."] },
+          { zh: "恐怕我們無法接受這個提案。", en: "I'm afraid we're unable to accept this proposal.", alt: ["I'm afraid we can't accept this proposal.", "I'm afraid we are not able to accept this proposal.", "I'm afraid we're not in a position to accept this proposal."] },
+          { zh: "請容我提出不同的看法。", en: "Allow me to offer a different perspective.", alt: ["Allow me to offer a different point of view.", "Let me offer a different perspective.", "Allow me to offer a different view.", "Allow me to present a different perspective."] },
+          { zh: "這件事恐怕需要從長計議。", en: "I'm afraid this will require more careful consideration.", alt: ["I'm afraid this requires more careful consideration.", "I'm afraid this needs more careful consideration.", "I'm afraid this will need more careful thought.", "I'm afraid we'll need to give this more careful thought."] },
+          { zh: "若有任何誤會，還請見諒。", en: "Please accept our apologies for any misunderstanding.", alt: ["Please accept my apologies for any misunderstanding.", "We apologize for any misunderstanding.", "Please forgive any misunderstanding.", "I apologize for any misunderstanding."] },
+          { zh: "坦白說，這樣的結果相當令人失望。", en: "Frankly, this outcome is rather disappointing.", alt: ["Frankly, the outcome is rather disappointing.", "To be frank, this outcome is rather disappointing.", "Frankly, this result is quite disappointing.", "To be frank, the result is quite disappointing."] },
+          { zh: "雙方在若干議題上仍存在分歧。", en: "The two sides remain divided on a number of issues.", alt: ["The two sides remain divided on several issues.", "The two sides still differ on a number of issues.", "The two sides still disagree on several issues.", "Both sides remain divided on a number of issues."] },
+          { zh: "我理解您的立場，但我們必須從大局考量。", en: "I understand your position, but we have to consider the bigger picture.", alt: ["I understand your position, but we need to consider the bigger picture.", "I understand your position, but we have to look at the bigger picture.", "I understand your position, but we must consider the bigger picture."] },
+          { zh: "我們會認真考慮您的建議，並盡快回覆。", en: "We will give your suggestion serious consideration and get back to you as soon as possible.", alt: ["We'll give your suggestion serious consideration and get back to you as soon as possible.", "We will seriously consider your suggestion and get back to you as soon as possible.", "We will give your suggestion serious consideration and respond as soon as possible."] },
+          { zh: "我們並不是反對這個構想，而是對執行方式有所保留。", en: "It's not that we oppose the idea; we just have reservations about how it will be implemented.", alt: ["We're not against the idea; we just have reservations about how it will be implemented.", "We are not opposed to the idea, but we have reservations about how it will be implemented.", "It's not that we're against the idea, but we have reservations about its implementation.", "We don't oppose the idea itself; we just have reservations about how it will be carried out."] },
+          { zh: "倘若貴方能在價格上展現更多彈性，我們樂於重新考慮。", en: "Should you be able to show more flexibility on price, we would be happy to reconsider.", alt: ["If you could show more flexibility on price, we would be happy to reconsider.", "If you could be more flexible on price, we'd be happy to reconsider.", "Should you show more flexibility on price, we would be glad to reconsider.", "If you can show more flexibility on the price, we would be happy to reconsider."] }
         ]
       }
     ]
