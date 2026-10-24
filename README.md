@@ -1,4 +1,4 @@
-# English Corner 英文角 v1.3.1
+# English Corner 英文角 v1.3.2
 
 中翻英打字＋聽寫練習網站。Level 1–5 情境主題，Level 1–4 各 3 個主題、Level 5 有 8 個主題，每主題 12 句，共 240 句。純靜態網頁（HTML/CSS/JS，不用 build）。
 

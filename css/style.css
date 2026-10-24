@@ -298,3 +298,4 @@ main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 64px; }
 }
 .listen-big { position: relative; z-index: 2; }
 .slots:empty { min-height: 0; }
+.hint-box { letter-spacing: 1.5px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }

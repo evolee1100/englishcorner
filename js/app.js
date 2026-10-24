@@ -150,7 +150,7 @@
     P = {
       ...found, mode,
       idx: saved.pos < found.tp.items.length ? saved.pos : 0,
-      input: "", status: "typing", attempts: 0, revealed: false, marks: [],
+      input: "", status: "typing", attempts: 0, revealed: false, hint: false, marks: [],
       session: { firstTry: 0, finished: 0, start: Date.now() }
     };
     stopTimer();
@@ -193,7 +193,8 @@
             <div class="slots" id="slots"></div>
             ${P.status !== "success" ? `<input class="typing-input" id="typing" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="輸入英文">` : ""}
           </div>
-          ${P.revealed && P.status !== "success" ? `<div class="answer-reveal"><small class="zh">${ez("參考答案（照著打一遍）")}</small>${esc(it.en)}</div>` : ""}
+          ${P.revealed && P.status !== "success" ? `<div class="answer-reveal"><small class="zh">${ez("參考答案（照著打一遍）")}</small>${esc(it.en)}</div>`
+            : P.hint && P.status !== "success" ? `<div class="answer-reveal hint-box"><small class="zh">${ez("提示：每個字的首字母")}</small>${esc(maskHint(it.en))}</div>` : ""}
           ${P.status === "success" ? renderResult(it) : ""}
           <div class="tools zh">
             <button class="tool" data-act="play">🔊 ${ez("發音")} <kbd>Tab</kbd></button>
@@ -332,21 +333,51 @@
       if (S.prefs.autoSpeak || P.mode === "dictation") speak(it.en);
       return;
     }
-    // 逐字標示對錯
-    const target = targetTokens(it.en);
-    P.marks = P.input.split(" ").map((w, i) => ({ text: w, ok: !!target[i] && wordKey(w) === wordKey(target[i].core) }));
-    renderSlots();
+    // 逐字標示對錯：用最長共同子序列對齊，多打或漏打一個字不會讓後面全部變紅
+    // 先把縮寫展開（I'm → i am）再比，這樣 I am 和 I'm 會被當成一樣
+    const toks = str => norm(str).trim().split(" ").filter(Boolean);
+    const target = toks(it.en);
+    const typed = P.input.trim().split(" ");
+    const flat = [], owner = [];
+    typed.forEach((w, i) => toks(w).forEach(t => { flat.push(t); owner.push(i); }));
+    const keep = lcsKeep(flat, target);
+    P.marks = typed.map((w, i) => ({ text: w, ok: owner.some((o, k) => o === i) && owner.every((o, k) => o !== i || keep.has(k)) }));
+    if (P.attempts >= 2) P.hint = true;
+    renderPractice();
     const stage = document.getElementById("stage");
     stage.classList.remove("shake"); void stage.offsetWidth; stage.classList.add("shake");
     if (P.attempts >= 3 && !P.revealed) {
       P.revealed = true;
       renderPractice();
       toast(z("錯了三次，先看答案照著打一遍"));
+    } else if (flat.length !== target.length) {
+      toast(z(flat.length > target.length ? "你多打了字，紅色的字可能不需要" : "你少打了字，再想想漏了什麼"));
     } else {
-      toast(z("紅色的字再檢查一下"));
+      toast(z(P.hint ? "看提示的首字母再試一次" : "紅色的字不對，再想想"));
     }
     focusInput();
   }
+
+  // 回傳 a 中屬於 a、b 最長共同子序列的索引
+  function lcsKeep(a, b) {
+    const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+    for (let i = a.length - 1; i >= 0; i--)
+      for (let j = b.length - 1; j >= 0; j--)
+        dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const keep = new Set();
+    for (let i = 0, j = 0; i < a.length && j < b.length;) {
+      if (a[i] === b[j]) { keep.add(i); i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) i++;
+      else j++;
+    }
+    return keep;
+  }
+
+  // 提示：每個字只留首字母，例如 I l___ i_ T_____.
+  const maskHint = en => en.split(/\s+/).map(w => {
+    let first = true;
+    return w.replace(/[A-Za-z]/g, c => { if (first) { first = false; return c; } return "_"; });
+  }).join(" ");
 
   function next() {
     speechSynthesis?.cancel();
@@ -356,7 +387,7 @@
       return;
     }
     if (P.status !== "success") S.setPos(P.tp.id, P.mode, P.idx + 1);
-    Object.assign(P, { idx: P.idx + 1, input: "", status: "typing", attempts: 0, revealed: false, marks: [] });
+    Object.assign(P, { idx: P.idx + 1, input: "", status: "typing", attempts: 0, revealed: false, hint: false, marks: [] });
     renderPractice();
     if (P.mode === "dictation") setTimeout(() => speak(item().en), 250);
   }
