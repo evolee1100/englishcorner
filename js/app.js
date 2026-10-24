@@ -480,7 +480,8 @@
     updateThemeBtn();
     focusInput();
   };
-  darkMq.addEventListener("change", updateThemeBtn);
+  // 舊版 Safari（14 以前）只有 addListener
+  if (darkMq.addEventListener) darkMq.addEventListener("change", updateThemeBtn); else darkMq.addListener?.(updateThemeBtn);
 
   // ---------- 路由 ----------
   function route(keepPractice) {

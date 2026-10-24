@@ -1,4 +1,4 @@
-# English Corner 英文角 v1.3.0
+# English Corner 英文角 v1.3.1
 
 中翻英打字＋聽寫練習網站。Level 1–5 情境主題，Level 1–4 各 3 個主題、Level 5 有 8 個主題，每主題 12 句，共 240 句。純靜態網頁（HTML/CSS/JS，不用 build）。
 
@@ -26,3 +26,6 @@ Supabase 內建寄信服務每小時只能寄少量信，正式公開前要在 A
 
 ## 新增題目
 編輯 `js/data.js`，中文一律用繁體撰寫，簡體會自動轉換。
+
+## 發版
+每次更新：把 `js/config.js` 的 `version` 和 `index.html` 裡所有 `?v=` 改成同一個新版本號，避免瀏覽器拿到舊的 JS/CSS（GitHub Pages 快取 10 分鐘）。
