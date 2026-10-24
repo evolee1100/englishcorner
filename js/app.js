@@ -204,7 +204,7 @@
               : `<button class="tool" data-act="reveal">👀 ${ez("看答案")} <kbd>Esc</kbd></button>
                  <button class="tool" data-act="skip">⏭ ${ez("略過")}</button>`}
           </div>
-          <div class="hint zh">${ez("單字之間按空白鍵，← → 移動游標修改，打完按 Enter 檢查。大小寫、標點、縮寫（I'm / I am）都不影響對錯。")}</div>
+          <div class="hint zh">${ez("單字之間按空白鍵，點字或用 ← → 移動游標修改，打完按 Enter 檢查。大小寫、標點、縮寫（I'm / I am）都不影響對錯。")}</div>
         </div>
       </section>`;
     bindPractice();
@@ -249,7 +249,7 @@
       const len = t ? t.core.length : Math.max(w.length, 1);
       const punct = t?.trail && !/[^A-Za-z0-9']$/.test(w) ? `<span class="punct">${esc(t.trail)}</span>` : "";
       const text = showCaret ? esc(w.slice(0, offset)) + '<i class="caret"></i>' + esc(w.slice(offset)) : esc(w);
-      html += `<span class="wgroup"><span class="${cls.join(" ")}" style="--len:${len}">${text}</span>${punct}</span>`;
+      html += `<span class="wgroup"><span class="${cls.join(" ")}" data-i="${i}" style="--len:${len}">${text}</span>${punct}</span>`;
     }
     box.innerHTML = html;
   }
@@ -293,13 +293,47 @@
       };
       input.onkeydown = e => { onKey(e); setTimeout(syncCaret, 0); };
       input.onkeyup = input.onselect = syncCaret;
-      // 滑鼠點下去的位置對不到看不見的文字，所以點擊一律把游標放到最後
-      input.onclick = () => { const l = input.value.length; input.setSelectionRange(l, l); syncCaret(); };
+      // 輸入框是透明的，點擊時依座標找出點到哪個字、哪個字母，把游標放過去
+      input.onclick = e => {
+        const pos = caretFromPoint(e.clientX, e.clientY);
+        input.setSelectionRange(pos, pos);
+        syncCaret();
+      };
       input.onfocus = () => { stage.classList.add("focus"); renderSlots(); };
       input.onblur = () => { stage.classList.remove("focus"); renderSlots(); };
       focusInput();
     }
   }
+  // 依螢幕座標換算成輸入字串中的游標位置；點在格子外就放到最後
+  function caretFromPoint(x, y) {
+    const typed = P.input.split(" ");
+    const slots = [...document.querySelectorAll("#slots .slot")];
+    let best = null, bestD = Infinity;
+    for (const el of slots) {
+      const r = el.getBoundingClientRect();
+      const dy = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0;
+      const dx = x < r.left ? r.left - x : x > r.right ? x - r.right : 0;
+      const d = dy * 1000 + dx; // 先比同一行，再比左右距離
+      if (d < bestD) { bestD = d; best = el; }
+    }
+    if (!best || bestD > 40000) return P.input.length;
+    const i = +best.dataset.i;
+    if (i >= typed.length) return P.input.length;
+    const start = typed.slice(0, i).join(" ").length + (i ? 1 : 0);
+    // 量每個字母的位置，點在字母中線左邊就放在它前面
+    let offset = 0;
+    const range = document.createRange();
+    for (const node of best.childNodes) {
+      if (node.nodeType !== Node.TEXT_NODE) continue;
+      for (let k = 0; k < node.length; k++) {
+        range.setStart(node, k); range.setEnd(node, k + 1);
+        const r = range.getBoundingClientRect();
+        if (x > r.left + r.width / 2) offset++;
+      }
+    }
+    return start + Math.min(offset, typed[i].length);
+  }
+
   function focusInput() {
     const input = document.getElementById("typing");
     if (input) { input.focus({ preventScroll: true }); const l = input.value.length; input.setSelectionRange(l, l); P.caret = l; }
