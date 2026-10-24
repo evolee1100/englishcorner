@@ -195,9 +195,11 @@ main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 64px; }
   transition: border-color .15s, color .15s;
 }
 .slot.active { border-bottom-color: var(--c1); }
-.slot.active::after {
-  content: ""; width: 3px; height: .9em; background: var(--c1); border-radius: 2px; margin-left: 2px; margin-bottom: .1em;
-  animation: blink 1s steps(1) infinite;
+/* 游標：寬度 0 不推擠文字，畫在字母之間 */
+.caret { position: relative; display: inline-block; width: 0; height: .9em; margin-bottom: .1em; }
+.caret::before {
+  content: ""; position: absolute; left: -1px; top: 0; width: 3px; height: 100%;
+  background: var(--c1); border-radius: 2px; animation: blink 1s steps(1) infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
 .slot.filled { border-bottom-color: color-mix(in srgb, var(--c1) 55%, var(--line)); }

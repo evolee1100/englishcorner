@@ -204,7 +204,7 @@
               : `<button class="tool" data-act="reveal">👀 ${ez("看答案")} <kbd>Esc</kbd></button>
                  <button class="tool" data-act="skip">⏭ ${ez("略過")}</button>`}
           </div>
-          <div class="hint zh">${ez("單字之間按空白鍵，打完按 Enter 檢查。大小寫、標點、縮寫（I'm / I am）都不影響對錯。")}</div>
+          <div class="hint zh">${ez("單字之間按空白鍵，← → 移動游標修改，打完按 Enter 檢查。大小寫、標點、縮寫（I'm / I am）都不影響對錯。")}</div>
         </div>
       </section>`;
     bindPractice();
@@ -228,7 +228,12 @@
     if (P.status === "success") { box.innerHTML = ""; return; }
     const target = targetTokens(item().en);
     const typed = P.input.split(" ");
-    const active = typed.length - 1;
+    // 游標在第幾個字、字裡的第幾個字母
+    const caret = Math.min(P.caret ?? P.input.length, P.input.length);
+    const before = P.input.slice(0, caret);
+    const active = before.split(" ").length - 1;
+    const offset = caret - (before.lastIndexOf(" ") + 1);
+    const focused = document.activeElement?.id === "typing";
     const n = Math.max(target.length, typed.length);
     let html = "";
     for (let i = 0; i < n; i++) {
@@ -236,13 +241,15 @@
       const w = typed[i] ?? "";
       const cls = ["slot"];
       if (!t) cls.push("extra");
-      if (i === active && document.activeElement?.id === "typing") cls.push("active");
+      const showCaret = i === active && focused;
+      if (showCaret) cls.push("active");
       if (w) cls.push("filled");
       const m = P.marks[i];
       if (m && m.text === w && w) cls.push(m.ok ? "right" : "wrong");
       const len = t ? t.core.length : Math.max(w.length, 1);
       const punct = t?.trail && !/[^A-Za-z0-9']$/.test(w) ? `<span class="punct">${esc(t.trail)}</span>` : "";
-      html += `<span class="wgroup"><span class="${cls.join(" ")}" style="--len:${len}">${esc(w)}</span>${punct}</span>`;
+      const text = showCaret ? esc(w.slice(0, offset)) + '<i class="caret"></i>' + esc(w.slice(offset)) : esc(w);
+      html += `<span class="wgroup"><span class="${cls.join(" ")}" style="--len:${len}">${text}</span>${punct}</span>`;
     }
     box.innerHTML = html;
   }
@@ -265,17 +272,29 @@
     const input = document.getElementById("typing");
     if (input) {
       input.value = P.input;
+      const tidy = str => str.replace(/^\s+/, "").replace(/\s{2,}/g, " ");
+      // 游標位置改變時更新畫面上的游標；不支援選取一段文字（看不到選取範圍）
+      const syncCaret = () => {
+        if (input.selectionStart !== input.selectionEnd) input.setSelectionRange(input.selectionEnd, input.selectionEnd);
+        if (P.caret !== input.selectionEnd) { P.caret = input.selectionEnd; renderSlots(); }
+      };
       input.oninput = () => {
-        // 連續空白壓成一個、不允許開頭空白
-        const v = input.value.replace(/^\s+/, "").replace(/\s{2,}/g, " ");
-        if (v !== input.value) input.value = v;
+        // 連續空白壓成一個、不允許開頭空白，並保住游標位置
+        const pos = input.selectionStart;
+        const v = tidy(input.value);
+        if (v !== input.value) {
+          const p = tidy(input.value.slice(0, pos)).length;
+          input.value = v;
+          input.setSelectionRange(p, p);
+        }
         P.input = v;
+        P.caret = input.selectionEnd;
         renderSlots();
       };
-      input.onkeydown = onKey;
-      // 畫面上看不到游標位置，所以游標永遠固定在最後
-      const toEnd = () => { const l = input.value.length; if (input.selectionStart !== l || input.selectionEnd !== l) input.setSelectionRange(l, l); };
-      input.onclick = input.onselect = input.onkeyup = toEnd;
+      input.onkeydown = e => { onKey(e); setTimeout(syncCaret, 0); };
+      input.onkeyup = input.onselect = syncCaret;
+      // 滑鼠點下去的位置對不到看不見的文字，所以點擊一律把游標放到最後
+      input.onclick = () => { const l = input.value.length; input.setSelectionRange(l, l); syncCaret(); };
       input.onfocus = () => { stage.classList.add("focus"); renderSlots(); };
       input.onblur = () => { stage.classList.remove("focus"); renderSlots(); };
       focusInput();
@@ -283,14 +302,13 @@
   }
   function focusInput() {
     const input = document.getElementById("typing");
-    if (input) { input.focus({ preventScroll: true }); const l = input.value.length; input.setSelectionRange(l, l); }
+    if (input) { input.focus({ preventScroll: true }); const l = input.value.length; input.setSelectionRange(l, l); P.caret = l; }
   }
 
   function onKey(e) {
     if (e.isComposing) return;
     // 答對後 input 會被移除，若讓事件冒泡到 document，同一個 Enter 會直接跳下一句
     if (["Enter", "Tab", "Escape"].includes(e.key)) e.stopPropagation();
-    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) { e.preventDefault(); return; }
     if (e.key === "Enter") { e.preventDefault(); act(P.status === "success" ? "next" : "check"); }
     else if (e.key === "Tab") { e.preventDefault(); act(e.shiftKey ? "slow" : "play"); }
     else if (e.key === "Escape") { e.preventDefault(); act("reveal"); }
