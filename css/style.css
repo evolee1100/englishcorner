@@ -9,6 +9,7 @@
   --ok: #2f9e44;
   --bad: #e03131;
   --radius: 16px;
+  color-scheme: light;
 
   /* 每個 Level 一個單色（-2 與 -1 相同，不做漸層） */
   --coral-1: #e8615a;  --coral-2: var(--coral-1);
@@ -20,8 +21,9 @@
   --c1: var(--purple-1);
   --c2: var(--purple-2);
 }
+/* 深色：沒手動選時跟系統；按鈕手動選的 data-theme 優先 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #121417;
     --surface: #1b1e23;
     --surface-2: #24282e;
@@ -29,7 +31,18 @@
     --muted: #9aa1ab;
     --line: #2f343b;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+    color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #121417;
+  --surface: #1b1e23;
+  --surface-2: #24282e;
+  --text: #e9ecef;
+  --muted: #9aa1ab;
+  --line: #2f343b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }

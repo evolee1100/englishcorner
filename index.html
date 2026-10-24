@@ -10,6 +10,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    // 載入前先套用手動選的深淺色，避免閃一下
+    try { const t = JSON.parse(localStorage.getItem("ec_prefs_v1") || "{}").theme; if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}
+  </script>
 </head>
 <body>
 
@@ -19,6 +23,7 @@
       <span class="brand-text">English <b>Corner</b></span>
     </a>
     <div class="topbar-actions">
+      <button class="chip" id="btn-theme" type="button" title="切換深色／淺色">🌙</button>
       <button class="chip" id="btn-script" type="button" title="繁簡切換">繁</button>
       <button class="chip chip-account" id="btn-account" type="button">登入同步</button>
     </div>

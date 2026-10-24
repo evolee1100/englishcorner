@@ -464,6 +464,24 @@
     toast(S.prefs.script === "cn" ? "已切换为简体中文" : "已切換為繁體中文");
   };
 
+  // 深淺色：預設跟系統，按一下切到相反的那個並記住
+  const themeBtn = document.getElementById("btn-theme");
+  const darkMq = window.matchMedia("(prefers-color-scheme: dark)");
+  const isDark = () => S.prefs.theme === "dark" || (S.prefs.theme !== "light" && darkMq.matches);
+  function updateThemeBtn() {
+    if (S.prefs.theme === "light" || S.prefs.theme === "dark") document.documentElement.dataset.theme = S.prefs.theme;
+    else delete document.documentElement.dataset.theme;
+    themeBtn.textContent = isDark() ? "☀️" : "🌙";
+    themeBtn.title = z(isDark() ? "切換成淺色" : "切換成深色");
+  }
+  themeBtn.onclick = () => {
+    S.prefs.theme = isDark() ? "light" : "dark";
+    S.savePrefs();
+    updateThemeBtn();
+    focusInput();
+  };
+  darkMq.addEventListener("change", updateThemeBtn);
+
   // ---------- 路由 ----------
   function route(keepPractice) {
     const m = location.hash.match(/^#\/p\/([\w-]+)\/(translate|dictation)$/);
@@ -480,6 +498,7 @@
   S.onChange(() => { if (!location.hash.startsWith("#/p/")) renderHome(); });
 
   updateScriptBtn();
+  updateThemeBtn();
   updateAccountBtn();
   route(false);
   S.initAuth(() => {

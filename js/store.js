@@ -15,7 +15,7 @@
   }
 
   let state = Object.assign(empty(), readJSON(KEY, {}));
-  const prefs = Object.assign({ script: "tw", autoSpeak: true, mode: "translate" }, readJSON(PREF_KEY, {}));
+  const prefs = Object.assign({ script: "tw", autoSpeak: true, mode: "translate", theme: "auto" }, readJSON(PREF_KEY, {}));
   const listeners = new Set();
 
   const today = () => {
