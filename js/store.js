@@ -15,7 +15,7 @@
   }
 
   let state = Object.assign(empty(), readJSON(KEY, {}));
-  const prefs = Object.assign({ script: "tw", autoSpeak: true, mode: "translate", theme: "light" }, readJSON(PREF_KEY, {}));
+  const prefs = Object.assign({ script: "tw", autoSpeak: true, mode: "translate", theme: "light", accent: "us" }, readJSON(PREF_KEY, {}));
   // 預設淺色；只有手動選過深色才用深色（舊版存的 "auto" 也當淺色）
   if (prefs.theme !== "dark") prefs.theme = "light";
   const listeners = new Set();

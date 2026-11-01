@@ -25,12 +25,20 @@
   const ez = s => esc(z(s));
 
   // ---------- 發音（Web Speech API） ----------
+  // 美式／英式：依 S.prefs.accent 挑語音；裝置沒有該口音時退回任一英文語音並記下來
+  const ACCENTS = {
+    us: { lang: "en-US", re: /^en[-_]US/i, prefer: ["Samantha", "Google US English", "Microsoft Aria", "Microsoft Jenny", "Microsoft Guy", "Ava", "Allison", "Alex"] },
+    uk: { lang: "en-GB", re: /^en[-_]GB/i, prefer: ["Daniel", "Google UK English Female", "Google UK English Male", "Microsoft Sonia", "Microsoft Libby", "Microsoft Ryan", "Serena", "Kate", "Arthur"] }
+  };
   let voice = null;
+  let voiceFallback = false;
   function pickVoice() {
-    const vs = speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
-    const prefer = ["Samantha", "Google US English", "Microsoft Aria", "Microsoft Jenny", "Alex", "Karen", "Daniel"];
-    voice = prefer.map(n => vs.find(v => v.name.includes(n))).find(Boolean)
-      || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+    const a = ACCENTS[S.prefs.accent] || ACCENTS.us;
+    const all = speechSynthesis.getVoices();
+    const vs = all.filter(v => a.re.test(v.lang));
+    voice = a.prefer.map(n => vs.find(v => v.name.includes(n))).find(Boolean) || vs[0] || null;
+    voiceFallback = !voice && all.length > 0;
+    if (!voice) voice = all.find(v => /^en[-_]/i.test(v.lang)) || null;
   }
   if ("speechSynthesis" in window) {
     pickVoice();
@@ -40,7 +48,7 @@
     if (!("speechSynthesis" in window)) { toast(z("這個瀏覽器不支援發音")); return; }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = voice?.lang || "en-US";
+    u.lang = voice?.lang || (ACCENTS[S.prefs.accent] || ACCENTS.us).lang;
     if (voice) u.voice = voice;
     u.rate = rate;
     if (onEnd) u.onend = onEnd;
@@ -181,6 +189,10 @@
           <div class="seg zh">
             ${Object.entries(MODES).map(([k, v]) => `<button data-mode="${k}" class="${k === mode ? "on" : ""}">${ez(v)}</button>`).join("")}
           </div>
+          <div class="seg zh" title="${ez("發音口音")}">
+            <button data-accent="us" class="${S.prefs.accent !== "uk" ? "on" : ""}">🇺🇸 ${ez("美式")}</button>
+            <button data-accent="uk" class="${S.prefs.accent === "uk" ? "on" : ""}">🇬🇧 ${ez("英式")}</button>
+          </div>
           <label class="toggle zh"><input type="checkbox" id="auto" ${S.prefs.autoSpeak ? "checked" : ""}>${ez("答對朗讀")}</label>
         </div>
         <div class="progress-dots">${tp.items.map((_, i) => `<i class="${doneSet.has(i) ? "done" : i === P.idx ? "cur" : ""}"></i>`).join("")}</div>
@@ -264,6 +276,15 @@
       if (b.dataset.mode !== P.mode) location.hash = `#/p/${P.tp.id}/${b.dataset.mode}`;
     });
     document.getElementById("auto").onchange = e => { S.prefs.autoSpeak = e.target.checked; S.savePrefs(); };
+    app.querySelectorAll("[data-accent]").forEach(b => b.onclick = () => {
+      S.prefs.accent = b.dataset.accent;
+      S.savePrefs();
+      pickVoice();
+      app.querySelectorAll("[data-accent]").forEach(x => x.classList.toggle("on", x === b));
+      if (voiceFallback) toast(z(S.prefs.accent === "uk" ? "這台裝置沒有英式語音，會用其他英文語音代替" : "這台裝置沒有美式語音，會用其他英文語音代替"));
+      speak(item().en);
+      focusInput();
+    });
     app.querySelectorAll("[data-act]").forEach(b => b.onclick = () => act(b.dataset.act));
     app.querySelectorAll("[data-word]").forEach(b => b.onclick = () => {
       b.classList.add("speaking");
