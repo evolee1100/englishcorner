@@ -152,7 +152,7 @@
     P = {
       ...found, mode,
       idx: saved.pos < found.tp.items.length ? saved.pos : 0,
-      input: "", status: "typing", attempts: 0, revealed: false, hint: false, marks: [],
+      input: "", status: "typing", attempts: 0, revealed: false, hint: false, feedback: "", marks: [],
       session: { firstTry: 0, finished: 0, start: Date.now() }
     };
     stopTimer();
@@ -195,6 +195,7 @@
             <div class="slots" id="slots"></div>
             ${P.status !== "success" ? `<input class="typing-input" id="typing" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="輸入英文">` : ""}
           </div>
+          ${P.feedback && P.status !== "success" ? `<div class="feedback-box zh">⚠️ ${ez(P.feedback)}</div>` : ""}
           ${P.revealed && P.status !== "success" ? `<div class="answer-reveal"><small class="zh">${ez("參考答案（照著打一遍）")}</small>${esc(it.en)}</div>`
             : P.hint && P.status !== "success" ? `<div class="answer-reveal hint-box"><small class="zh">${ez("提示：每個字的首字母")}</small>${esc(maskHint(it.en))}${it.note ? `<div class="grammar-note zh">📘 ${ez(it.note)}</div>` : ""}</div>` : ""}
           ${P.status === "success" ? renderResult(it) : ""}
@@ -206,7 +207,7 @@
               : `<button class="tool" data-act="reveal">👀 ${ez("看答案")} <kbd>Esc</kbd></button>
                  <button class="tool" data-act="skip">⏭ ${ez("略過")}</button>`}
           </div>
-          <div class="hint zh">${ez("單字之間按空白鍵，點字或用 ← → 移動游標修改，打完按 Enter 檢查。大小寫、標點、縮寫（I'm / I am）都不影響對錯。")}</div>
+          <div class="hint zh">${ez("單字之間按空白鍵，點字或用 ← → 移動游標修改，打完按 Enter 檢查。大小寫和標點不影響對錯；I'm 和 I am 算一樣，但要注意 I'm = I am，不等於 I。")}</div>
         </div>
       </section>`;
     bindPractice();
@@ -397,6 +398,7 @@
     typed.forEach((w, i) => toks(w).forEach(t => { flat.push(t); owner.push(i); }));
     const keep = lcsKeep(flat, target);
     P.marks = typed.map((w, i) => ({ text: w, ok: owner.some((o, k) => o === i) && owner.every((o, k) => o !== i || keep.has(k)) }));
+    P.feedback = extraBeFeedback(flat, owner, typed, it);
     if (P.attempts >= 2) P.hint = true;
     renderPractice();
     const stage = document.getElementById("stage");
@@ -405,12 +407,31 @@
       P.revealed = true;
       renderPractice();
       toast(z("錯了三次，先看答案照著打一遍"));
+    } else if (P.feedback) {
+      toast(z("多了一個 be 動詞，看下面的說明"));
     } else if (flat.length !== target.length) {
       toast(z(flat.length > target.length ? "你多打了字，紅色的字可能不需要" : "你少打了字，再想想漏了什麼"));
     } else {
       toast(z(P.hint ? "看提示的首字母再試一次" : "紅色的字不對，再想想"));
     }
     focusInput();
+  }
+
+  // 常見錯誤：把 I'm 當成 I（I'm start work…）。拿掉某一個 be 動詞後若完全正確，就明確指出來
+  const BE = new Set(["am", "is", "are", "was", "were"]);
+  function extraBeFeedback(flat, owner, typed, it) {
+    const answers = [it.en, ...(it.alt || [])].map(a => norm(a).trim());
+    for (let k = 0; k < flat.length; k++) {
+      if (!BE.has(flat[k])) continue;
+      if (!answers.includes(flat.filter((_, j) => j !== k).join(" "))) continue;
+      const raw = typed[owner[k]];
+      const contracted = /'/.test(raw);
+      const verb = flat[k + 1] || "";
+      return contracted
+        ? `「${raw}」= ${norm(raw).trim().replace(/^i /, "I ")}。這句已經有動詞 ${verb}，不需要 ${flat[k]}，所以不能用「${raw}」。`
+        : `這句已經有動詞 ${verb}，不需要 ${flat[k]}，把它拿掉就對了。`;
+    }
+    return "";
   }
 
   // 回傳 a 中屬於 a、b 最長共同子序列的索引
@@ -442,7 +463,7 @@
       return;
     }
     if (P.status !== "success") S.setPos(P.tp.id, P.mode, P.idx + 1);
-    Object.assign(P, { idx: P.idx + 1, input: "", status: "typing", attempts: 0, revealed: false, hint: false, marks: [] });
+    Object.assign(P, { idx: P.idx + 1, input: "", status: "typing", attempts: 0, revealed: false, hint: false, feedback: "", marks: [] });
     renderPractice();
     if (P.mode === "dictation") setTimeout(() => speak(item().en), 250);
   }
