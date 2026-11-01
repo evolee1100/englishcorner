@@ -17,6 +17,7 @@
   --green-1: #2f9e44;  --green-2: var(--green-1);
   --blue-1:  #1c7ed6;  --blue-2:  var(--blue-1);
   --purple-1:#7048e8;  --purple-2:var(--purple-1);
+  --teal-1:  #0c8599;  --teal-2:  var(--teal-1);
 
   --c1: var(--purple-1);
   --c2: var(--purple-2);
@@ -306,3 +307,4 @@ main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 64px; }
   font-size: 14px; font-weight: 700; letter-spacing: 0; font-family: "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
   background: var(--surface-2); border-left: 4px solid var(--c1); color: var(--text);
 }
+.level-badge .badge-word { font-size: 13px; letter-spacing: .5px; }

@@ -7,7 +7,8 @@
     amber: ["var(--amber-1)", "var(--amber-2)"],
     green: ["var(--green-1)", "var(--green-2)"],
     blue: ["var(--blue-1)", "var(--blue-2)"],
-    purple: ["var(--purple-1)", "var(--purple-2)"]
+    purple: ["var(--purple-1)", "var(--purple-2)"],
+    teal: ["var(--teal-1)", "var(--teal-2)"]
   };
   const MODES = { translate: "中翻英", dictation: "聽寫" };
   const PRAISE = ["太棒了！", "完全正確！", "漂亮！", "Nice!", "Great job!", "就是這樣！", "Perfect!"];
@@ -109,7 +110,7 @@
           return `
           <article class="level" style="${lvStyle(lv)}">
             <div class="level-head">
-              <div class="level-badge">LEVEL<b>${lv.id}</b></div>
+              <div class="level-badge">${lv.badge ? `<b class="badge-word">${esc(lv.badge)}</b>` : `LEVEL<b>${lv.id}</b>`}</div>
               <div>
                 <h2 class="level-title zh">${ez(lv.name)}<small>${esc(lv.en)}</small></h2>
                 <p class="level-desc zh">${ez(lv.desc)}</p>
@@ -172,7 +173,7 @@
       <section class="practice" style="${lvStyle(lv)}">
         <div class="pbar">
           <button class="back zh" id="back">← ${ez("首頁")}</button>
-          <div class="ptitle zh">L${lv.id} · ${ez(tp.name)}<small>${esc(tp.en)}</small></div>
+          <div class="ptitle zh">${lv.badge ? esc(lv.badge) : "L" + lv.id} · ${ez(tp.name)}<small>${esc(tp.en)}</small></div>
           <div class="spacer"></div>
           <span class="pill">${P.idx + 1}/${tp.items.length}</span>
           <span class="pill">⏱ <span id="clock">${fmtTime(Math.floor((Date.now() - P.session.start) / 1000))}</span></span>
@@ -457,7 +458,7 @@
         <div class="stage done-card" id="done-card">
           <div class="big">🎉</div>
           <h2 class="zh">${ez(tp.name)} ${ez("完成！")}</h2>
-          <p class="zh" style="color:var(--muted)">${ez(MODES[mode])} · Level ${lv.id}</p>
+          <p class="zh" style="color:var(--muted)">${ez(MODES[mode])} · ${lv.badge ? esc(lv.badge) : "Level " + lv.id}</p>
           <div class="done-grid">
             <div><b>${session.finished}</b><span class="zh">${ez("完成句數")}</span></div>
             <div><b>${acc}%</b><span class="zh">${ez("一次就對")}</span></div>
