@@ -548,7 +548,7 @@
     toast(S.prefs.script === "cn" ? "已切换为简体中文" : "已切換為繁體中文");
   };
 
-  // 深淺色：預設跟系統，按一下切到相反的那個並記住
+  // 深淺色：預設淺色，按一下切到相反的那個並記住
   const themeBtn = document.getElementById("btn-theme");
   const darkMq = window.matchMedia("(prefers-color-scheme: dark)");
   const isDark = () => S.prefs.theme === "dark" || (S.prefs.theme !== "light" && darkMq.matches);
