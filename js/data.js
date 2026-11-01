@@ -1,9 +1,66 @@
 // 題庫：中文一律以繁體撰寫，簡體由 OpenCC 即時轉換。
 // en = 標準答案（顯示用）；alt = 其他也算對的說法；note = 答完後顯示的一行文法說明。
-// 難度由易到難：L1 短句（約 6 字）→ L5 長句（約 12 字）；C1 挑戰與 WORK 工作英文是選修專題。
+// 難度由易到難：L0 入門（3–5 字）→ L1 短句（約 6 字）→ L5 長句（約 12 字）；C1 挑戰與 WORK 工作英文是選修專題。
 // badge 欄位：非等級的專題在首頁顯示 badge 文字而不是 LEVEL 數字。
 // 主題 id 不隨等級改變，換等級時使用者的進度會跟著主題走。
 window.LEVELS = [
+  {
+    id: 0, name: "入門", en: "Starter", color: "lime",
+    desc: "3–5 個字的短句：感覺（I'm + 形容詞）、每天做的事、昨天的事",
+    topics: [
+      {
+        id: "0-1", name: "我的感覺", en: "How I Feel",
+        items: [
+          { zh: "我很忙。", en: "I'm very busy.", alt: ["I am very busy.","I'm so busy.","I'm really busy."], note: "I'm + 形容詞（busy）✓；I'm + 動詞（start）✗" },
+          { zh: "我好累。", en: "I'm so tired.", alt: ["I am so tired.","I'm very tired.","I'm really tired."], note: "tired 是形容詞，所以要用 I'm" },
+          { zh: "我很好。", en: "I'm fine.", alt: ["I am fine.","I'm good.","I'm okay."], note: "I'm = I am" },
+          { zh: "我餓了。", en: "I'm hungry.", alt: ["I am hungry."], note: "hungry 是形容詞 → I'm hungry" },
+          { zh: "她很開心。", en: "She's very happy.", alt: ["She is very happy.","She's so happy.","She's really happy."], note: "she 用 is：She's = She is" },
+          { zh: "他生病了。", en: "He's sick.", alt: ["He is sick.","He's ill.","He is ill."], note: "he 用 is：He's = He is" },
+          { zh: "我們準備好了。", en: "We're ready.", alt: ["We are ready."], note: "we 用 are：We're = We are" },
+          { zh: "我不冷。", en: "I'm not cold.", alt: ["I am not cold."], note: "否定：I'm not + 形容詞" },
+          { zh: "你還好嗎？", en: "Are you okay?", alt: ["Are you OK?","Are you all right?","Are you alright?"], note: "問句把 are 放前面：Are you…?" },
+          { zh: "我有點緊張。", en: "I'm a little nervous.", alt: ["I am a little nervous.","I'm a bit nervous."], note: "a little / a bit = 有點" },
+          { zh: "今天很熱。", en: "It's very hot today.", alt: ["It is very hot today.","It's so hot today.","Today is very hot."], note: "天氣用 it：It's hot" },
+          { zh: "這很簡單。", en: "This is easy.", alt: ["This is very easy.","It's easy.","It is easy."], note: "this / it 用 is" }
+        ]
+      },
+      {
+        id: "0-2", name: "每天做的事", en: "Every Day",
+        items: [
+          { zh: "我喝咖啡。", en: "I drink coffee.", note: "動作句不加 am：I drink（不是 I'm drink）" },
+          { zh: "我在台北工作。", en: "I work in Taipei.", note: "動作句不加 am：I work（不是 I'm work）" },
+          { zh: "我每天走路。", en: "I walk every day.", note: "every day = 每天 → 現在式" },
+          { zh: "我說中文。", en: "I speak Chinese.", alt: ["I speak Mandarin."], note: "語言名稱字首大寫：Chinese" },
+          { zh: "她喜歡貓。", en: "She likes cats.", note: "she / he / it 後面的動詞要加 s：likes" },
+          { zh: "他住在台中。", en: "He lives in Taichung.", note: "he 後面的動詞加 s：lives" },
+          { zh: "我們搭捷運。", en: "We take the MRT.", note: "take the MRT = 搭捷運" },
+          { zh: "我八點起床。", en: "I get up at eight.", alt: ["I get up at 8.","I wake up at eight.","I wake up at 8."], note: "at + 時刻" },
+          { zh: "我不吃肉。", en: "I don't eat meat.", alt: ["I do not eat meat."], note: "否定：don't + 動詞（不是 I'm not eat）" },
+          { zh: "你喜歡咖啡嗎？", en: "Do you like coffee?", note: "動作句的問句用 Do you…?（不是 Are you like…?）" },
+          { zh: "我會游泳。", en: "I can swim.", note: "can + 動詞原形" },
+          { zh: "他每天看書。", en: "He reads every day.", alt: ["He reads books every day."], note: "he 後面的動詞加 s：reads" }
+        ]
+      },
+      {
+        id: "0-3", name: "昨天的事", en: "Yesterday",
+        items: [
+          { zh: "我昨天很忙。", en: "I was busy yesterday.", alt: ["I was very busy yesterday.","Yesterday I was busy."], note: "過去 + 形容詞：am → was" },
+          { zh: "我吃了早餐。", en: "I ate breakfast.", alt: ["I had breakfast."], note: "eat → ate（不規則）" },
+          { zh: "我去了公司。", en: "I went to the office.", alt: ["I went to work."], note: "go → went（不規則）" },
+          { zh: "她打給我。", en: "She called me.", note: "call → called（過去式加 -ed）" },
+          { zh: "我們看了電影。", en: "We watched a movie.", alt: ["We watched a film.","We saw a movie."], note: "watch → watched" },
+          { zh: "我睡得很好。", en: "I slept well.", alt: ["I slept very well."], note: "sleep → slept；well 修飾動詞" },
+          { zh: "我忘了。", en: "I forgot.", note: "forget → forgot（不規則）" },
+          { zh: "我買了咖啡。", en: "I bought coffee.", alt: ["I bought a coffee.","I bought some coffee."], note: "buy → bought（不規則）" },
+          { zh: "我們很開心。", en: "We were happy.", alt: ["We were very happy."], note: "過去：are → were" },
+          { zh: "我昨天在家。", en: "I was at home yesterday.", alt: ["I was home yesterday.","Yesterday I was at home."], note: "過去：am → was；at home = 在家" },
+          { zh: "他昨天沒來。", en: "He didn't come yesterday.", alt: ["He did not come yesterday.","Yesterday he didn't come."], note: "否定：didn't + 原形 come" },
+          { zh: "你吃飯了嗎？", en: "Did you eat?", alt: ["Have you eaten?","Did you eat yet?"], note: "問過去：Did you + 原形？" }
+        ]
+      }
+    ]
+  },
   {
     id: 1, name: "基礎句型", en: "Basics", color: "coral",
     desc: "辦公室日常、簡單溝通、下班生活（短句、基本時態）",

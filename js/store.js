@@ -113,9 +113,9 @@
 
     getTopic(topicId, mode) { return topicMode(topicId, mode); },
     doneCount(topicId) {
-      // 主題完成數：兩種模式任一完成都算
+      // 主題完成數：任一模式（排序、中翻英、聽寫）完成都算
       const p = state.progress[topicId] || {};
-      const s = new Set([...(p.translate?.done || []), ...(p.dictation?.done || [])]);
+      const s = new Set([...(p.tiles?.done || []), ...(p.translate?.done || []), ...(p.dictation?.done || [])]);
       return s.size;
     },
     markDone(topicId, mode, index) {
