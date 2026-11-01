@@ -1,6 +1,6 @@
 // 題庫：中文一律以繁體撰寫，簡體由 OpenCC 即時轉換。
 // en = 標準答案（顯示用）；alt = 其他也算對的說法。
-// Level 1–2 依英文老師評語針對弱點（時態、句子建構、介係詞），Level 3–4 各 3 個情境主題、Level 5 有 8 個；每主題 12 句。
+// Level 1–4 依英文老師評語針對弱點（時態、句子建構、介係詞、表達觀點），由易到難；Level 5 有 8 個主題；每主題 12 句。
 // note = 答完後顯示的一行文法說明（選填）。
 window.LEVELS = [
   {
@@ -118,115 +118,115 @@ window.LEVELS = [
     ]
   },
   {
-    id: 3, name: "中級", en: "Intermediate", color: "green",
-    desc: "旅遊、交通、看醫生",
+    id: 3, name: "進階句型", en: "Advanced Grammar", color: "green",
+    desc: "情態推測與後悔、轉述與間接問句、關係子句與分詞",
     topics: [
       {
-        id: "3-1", name: "旅遊住宿", en: "Travel & Hotels",
+        id: "3x-1", name: "推測與後悔", en: "Modals & Regret",
         items: [
-          { zh: "我訂了一間雙人房。", en: "I booked a double room.", alt: ["I've booked a double room.", "I have a reservation for a double room."] },
-          { zh: "我想辦理入住。", en: "I'd like to check in.", alt: ["I want to check in."] },
-          { zh: "退房時間是幾點？", en: "What time is checkout?", alt: ["What time is check-out?", "When is checkout?"] },
-          { zh: "早餐有包含在房價裡嗎？", en: "Is breakfast included?", alt: ["Is breakfast included in the price?"] },
-          { zh: "Wi-Fi 密碼是什麼？", en: "What's the Wi-Fi password?", alt: ["What is the WiFi password?", "What's the WiFi password?"] },
-          { zh: "可以幫我保管行李嗎？", en: "Could you keep my luggage for me?", alt: ["Can you hold my luggage?", "Could you hold my bags for me?"] },
-          { zh: "附近有什麼好玩的地方？", en: "Are there any fun places nearby?", alt: ["What are some fun places nearby?", "What's fun to do around here?"] },
-          { zh: "這是我第一次來這裡。", en: "This is my first time here." },
-          { zh: "你可以幫我們拍張照嗎？", en: "Could you take a picture of us?", alt: ["Can you take a photo of us?", "Could you take a photo of us?"] },
-          { zh: "我的房間冷氣壞了。", en: "The air conditioner in my room is broken.", alt: ["The AC in my room isn't working.", "The air conditioning in my room is broken."] },
-          { zh: "我想多住一晚。", en: "I'd like to stay one more night.", alt: ["I want to stay one more night.", "I'd like to extend my stay by one night."] },
-          { zh: "這趟旅行比我預期的還要棒。", en: "This trip was better than I expected.", alt: ["The trip was better than I expected."] }
+          { zh: "他一定是忘了，不然他會打電話來的。", en: "He must have forgotten; otherwise, he would have called.", alt: ["He must have forgotten, or he would have called.", "He must have forgotten, otherwise he would have called.", "He must have forgotten. Otherwise, he would have called."], note: "must have + 過去分詞 = 過去一定是（有把握的推測）" },
+          { zh: "她今天沒來上班，可能是生病了。", en: "She didn't come to work today, so she might be sick.", alt: ["She didn't come to work today; she might be sick.", "She didn't come to work today, so she may be sick.", "She didn't come to work today. She might be ill."], note: "might / may + 原形 = 現在可能（沒把握）" },
+          { zh: "地上是濕的，昨晚一定下過雨。", en: "The ground is wet, so it must have rained last night.", alt: ["The ground is wet; it must have rained last night.", "It must have rained last night because the ground is wet.", "The ground's wet, so it must have rained last night."], note: "看到證據推測過去：must have rained" },
+          { zh: "你早該告訴我會議改時間了。", en: "You should have told me the meeting time had changed.", alt: ["You should have told me that the meeting time had changed.", "You should have told me the meeting had been rescheduled.", "You should have told me the meeting was rescheduled."], note: "should have + 過去分詞 = 早該（但沒做）" },
+          { zh: "我們本來可以搭早一點的火車，但我們睡過頭了。", en: "We could have taken an earlier train, but we overslept.", alt: ["We could have caught an earlier train, but we overslept.", "We could've taken an earlier train, but we overslept."], note: "could have + 過去分詞 = 本來可以；oversleep → overslept" },
+          { zh: "他不可能看過那份報告，因為我還沒寄出去。", en: "He can't have read the report, because I haven't sent it yet.", alt: ["He can't have read the report because I haven't sent it out yet.", "He couldn't have read the report, because I haven't sent it yet.", "He can't have seen the report because I haven't sent it yet."], note: "can't / couldn't have + 過去分詞 = 過去不可能" },
+          { zh: "我真希望當時沒說那些話。", en: "I wish I hadn't said those things.", alt: ["I really wish I hadn't said those things.", "I wish I had not said those things back then.", "I wish I hadn't said those things back then."], note: "對過去後悔：I wish + had + 過去分詞" },
+          { zh: "你不必那麼早來的，會議十點才開始。", en: "You didn't have to come so early; the meeting doesn't start until ten.", alt: ["You needn't have come so early; the meeting doesn't start until ten.", "You didn't need to come so early. The meeting doesn't start until ten.", "You didn't have to come so early. The meeting doesn't start until 10."], note: "not … until ten = 十點才…；needn't have + 過去分詞 = 其實不必（卻做了）" },
+          { zh: "他可能已經走了，因為他的車不在停車場。", en: "He may have already left, since his car isn't in the parking lot.", alt: ["He might have already left because his car isn't in the parking lot.", "He may have left already, because his car isn't in the parking lot.", "He might have left already since his car isn't in the car park."], note: "may / might have + 過去分詞 = 過去可能已經" },
+          { zh: "你最好在下雨前把衣服收進來。", en: "You'd better bring the laundry in before it rains.", alt: ["You'd better bring in the laundry before it rains.", "You'd better bring the clothes in before it rains.", "You had better bring the clothes in before it starts raining."], note: "had better + 原形 = 最好…；before it rains 不用 will" },
+          { zh: "我們應該事先訂位的，現在得等一個小時。", en: "We should have booked a table in advance; now we have to wait an hour.", alt: ["We should have made a reservation in advance; now we have to wait an hour.", "We should've booked a table in advance. Now we have to wait an hour.", "We should have booked a table in advance; now we have to wait for an hour."], note: "should have + 過去分詞：事後才發現該做" },
+          { zh: "要是你當初有聽我的建議，現在就不會有這個問題了。", en: "If you had listened to my advice, you wouldn't have this problem now.", alt: ["If you'd listened to my advice, you wouldn't have this problem now.", "If you had taken my advice, you wouldn't have this problem now.", "Had you listened to my advice, you wouldn't have this problem now."], note: "混合假設：過去沒聽（had listened）→ 現在的結果（wouldn't have）" }
         ]
       },
       {
-        id: "3-2", name: "交通問路", en: "Getting Around",
+        id: "3x-2", name: "轉述與間接問句", en: "Reported Speech",
         items: [
-          { zh: "請問捷運站怎麼走？", en: "How do I get to the MRT station?", alt: ["How can I get to the MRT station?", "Which way is the MRT station?"] },
-          { zh: "走路要多久？", en: "How long does it take to walk there?", alt: ["How long is the walk?"] },
-          { zh: "直走然後在第二個路口右轉。", en: "Go straight and turn right at the second intersection.", alt: ["Go straight and turn right at the second corner."] },
-          { zh: "這班公車有到機場嗎？", en: "Does this bus go to the airport?" },
-          { zh: "下一班火車幾點開？", en: "When does the next train leave?", alt: ["What time does the next train leave?"] },
-          { zh: "我要一張到台中的來回票。", en: "I'd like a round-trip ticket to Taichung.", alt: ["A round-trip ticket to Taichung, please.", "I'd like a return ticket to Taichung."] },
-          { zh: "我需要在哪裡換車？", en: "Where do I need to transfer?", alt: ["Where do I change trains?", "Where should I transfer?"] },
-          { zh: "請在這裡停車。", en: "Please stop here.", alt: ["Could you stop here, please?"] },
-          { zh: "我好像迷路了。", en: "I think I'm lost." },
-          { zh: "路上塞車很嚴重。", en: "The traffic is really bad.", alt: ["There's heavy traffic.", "Traffic is terrible."] },
-          { zh: "我錯過了最後一班車。", en: "I missed the last bus.", alt: ["I missed the last train."] },
-          { zh: "從這裡搭計程車大概要多少錢？", en: "How much would a taxi cost from here?", alt: ["How much is a taxi from here?"] }
+          { zh: "你知道最近的捷運站在哪裡嗎？", en: "Do you know where the nearest MRT station is?", alt: ["Do you know where the closest MRT station is?", "Do you happen to know where the nearest MRT station is?"], note: "間接問句：where … is（不是 where is …）" },
+          { zh: "我不記得我把傘放在哪裡了。", en: "I can't remember where I put my umbrella.", alt: ["I can't remember where I left my umbrella.", "I don't remember where I put my umbrella.", "I don't remember where I left my umbrella."], note: "間接問句：where I put（不是 where did I put）" },
+          { zh: "可以告訴我這個要多少錢嗎？", en: "Could you tell me how much this costs?", alt: ["Can you tell me how much this costs?", "Could you tell me how much this is?", "Could you tell me what this costs?"], note: "間接問句：how much this costs（不是 how much does this cost）" },
+          { zh: "我想知道你昨天為什麼沒來。", en: "I'd like to know why you didn't come yesterday.", alt: ["I want to know why you didn't come yesterday.", "I'd like to know why you didn't show up yesterday.", "I wonder why you didn't come yesterday."], note: "間接問句：why you didn't come（不是 why didn't you come）" },
+          { zh: "他告訴我他下週要出差。", en: "He told me he would be on a business trip next week.", alt: ["He told me that he would be on a business trip next week.", "He told me he'd be on a business trip next week.", "He told me he would be going on a business trip next week."], note: "轉述：will → would；told + 人" },
+          { zh: "她問我有沒有看過那部電影。", en: "She asked me whether I had seen that movie.", alt: ["She asked me if I had seen that movie.", "She asked me if I'd seen the movie.", "She asked me whether I had seen the film."], note: "轉述是非問句用 if / whether，語序是「主詞 + 動詞」" },
+          { zh: "經理說報告必須在週五前完成。", en: "The manager said the report had to be finished by Friday.", alt: ["The manager said that the report had to be finished by Friday.", "The manager said the report had to be done by Friday.", "The manager said the report needed to be finished by Friday."], note: "轉述：must → had to；by Friday = 週五之前" },
+          { zh: "她說她已經在這裡住了五年。", en: "She said she had lived here for five years.", alt: ["She said that she had lived here for five years.", "She said she had been living here for five years.", "She said she'd lived here for five years."], note: "轉述：have lived → had lived（時態往前推一格）" },
+          { zh: "他們問我們什麼時候能把貨送到。", en: "They asked us when we could deliver the goods.", alt: ["They asked us when we would be able to deliver the goods.", "They asked when we could deliver the goods.", "They asked us when we could deliver the order."], note: "轉述疑問句：when we could（主詞在前）；can → could" },
+          { zh: "醫生建議我每天至少走路三十分鐘。", en: "The doctor advised me to walk for at least thirty minutes a day.", alt: ["The doctor advised me to walk for at least 30 minutes a day.", "The doctor advised me to walk at least thirty minutes every day.", "The doctor suggested that I walk for at least thirty minutes a day."], note: "advise + 人 + to V；suggest that + 人 + 原形" },
+          { zh: "老師提醒我們別忘了交作業。", en: "The teacher reminded us not to forget to hand in our homework.", alt: ["The teacher reminded us to hand in our homework.", "The teacher reminded us not to forget to turn in our homework.", "The teacher reminded us not to forget to submit our homework."], note: "remind + 人 + (not) to V" },
+          { zh: "他否認拿了那筆錢。", en: "He denied taking the money.", alt: ["He denied having taken the money.", "He denied that he had taken the money.", "He denied that he took the money."], note: "deny + V-ing（不是 deny to take）" }
         ]
       },
       {
-        id: "3-3", name: "看醫生", en: "At the Doctor",
+        id: "3x-3", name: "關係子句與分詞", en: "Clauses & Participles",
         items: [
-          { zh: "我想掛號看醫生。", en: "I'd like to see a doctor.", alt: ["I'd like to make an appointment with a doctor."] },
-          { zh: "我頭痛。", en: "I have a headache." },
-          { zh: "我喉嚨痛又咳嗽。", en: "I have a sore throat and a cough." },
-          { zh: "我從昨天開始發燒。", en: "I've had a fever since yesterday." },
-          { zh: "我晚上睡不好。", en: "I can't sleep well at night.", alt: ["I don't sleep well at night."] },
-          { zh: "這個症狀持續多久了？", en: "How long have you had these symptoms?", alt: ["How long have you had this symptom?"] },
-          { zh: "你有對任何藥物過敏嗎？", en: "Are you allergic to any medication?", alt: ["Are you allergic to any medicine?", "Do you have any drug allergies?"] },
-          { zh: "這個藥一天吃三次，飯後吃。", en: "Take this medicine three times a day after meals.", alt: ["Take this three times a day after meals."] },
-          { zh: "你需要多休息和多喝水。", en: "You need to get more rest and drink more water.", alt: ["You need more rest and more water."] },
-          { zh: "我扭到腳踝了。", en: "I sprained my ankle.", alt: ["I twisted my ankle."] },
-          { zh: "我需要請病假嗎？", en: "Do I need to take sick leave?", alt: ["Should I take sick leave?"] },
-          { zh: "如果沒有好轉，請再回來複診。", en: "If it doesn't get better, please come back for a follow-up.", alt: ["Come back for a follow-up if it doesn't get better.", "If you don't feel better, please come back."] }
+          { zh: "住在我樓上的鄰居每天晚上都在練鋼琴。", en: "The neighbor who lives upstairs practices the piano every night.", alt: ["The neighbor who lives above me practices the piano every night.", "My upstairs neighbor practices the piano every night.", "The neighbour who lives upstairs practises the piano every night."], note: "who lives… 修飾 neighbor；practices 第三人稱要加 s" },
+          { zh: "這是我去年在京都住的那間飯店。", en: "This is the hotel where I stayed in Kyoto last year.", alt: ["This is the hotel I stayed at in Kyoto last year.", "This is the hotel that I stayed at in Kyoto last year."], note: "地點用 where；或 the hotel (that) I stayed at" },
+          { zh: "我永遠不會忘記我們第一次見面的那天。", en: "I'll never forget the day we first met.", alt: ["I'll never forget the day when we first met.", "I'll never forget the day that we first met.", "I'll never forget the day we met for the first time."], note: "時間用 when，也可以省略" },
+          { zh: "我昨天借你的那本書，你看完了嗎？", en: "Have you finished the book I lent you yesterday?", alt: ["Have you finished reading the book I lent you yesterday?", "Have you finished the book that I lent you yesterday?", "Did you finish the book I lent you yesterday?"], note: "the book (that) I lent you；lend → lent" },
+          { zh: "我有個朋友，他的哥哥是機師。", en: "I have a friend whose brother is a pilot.", alt: ["I have a friend whose older brother is a pilot.", "I've got a friend whose brother is a pilot.", "I have a friend whose big brother is a pilot."], note: "whose = …的（所有格關係代名詞）" },
+          { zh: "他是我認識的人當中最有耐心的。", en: "He's the most patient person I know.", alt: ["He's the most patient person I've ever met.", "Of all the people I know, he's the most patient.", "He's the most patient person that I know."], note: "最高級 + (that) I know / I've ever met" },
+          { zh: "他們給我們的建議非常有用。", en: "The advice they gave us was very useful.", alt: ["The advice that they gave us was very useful.", "The advice they gave us was very helpful.", "The advice they gave us was really useful."], note: "advice 不可數（不加 s），所以用 was" },
+          { zh: "被選上的人下週會收到通知。", en: "Those who are selected will be notified next week.", alt: ["The people who are selected will be notified next week.", "Those selected will be notified next week.", "The people selected will be notified next week."], note: "those who… = 那些…的人；被動 will be notified" },
+          { zh: "聽到這個消息，她忍不住哭了。", en: "Hearing the news, she couldn't help crying.", alt: ["When she heard the news, she couldn't help crying.", "When she heard the news, she couldn't help but cry.", "Hearing the news, she couldn't stop crying."], note: "分詞構句：Hearing… = When she heard…；can't help + V-ing" },
+          { zh: "不知道該說什麼，我只好保持沉默。", en: "Not knowing what to say, I kept quiet.", alt: ["Not knowing what to say, I stayed silent.", "Because I didn't know what to say, I kept quiet.", "I didn't know what to say, so I kept quiet."], note: "否定分詞構句：Not knowing… = Because I didn't know…" },
+          { zh: "這部用手機拍的電影得了好幾個獎。", en: "This film, which was shot on a phone, has won several awards.", alt: ["This movie, which was shot on a phone, has won several awards.", "This film shot on a phone has won several awards.", "This movie, which was filmed on a phone, has won several awards."], note: "非限定關係子句（逗號 + which）；shot = 拍攝（過去分詞）" },
+          { zh: "我們住的社區最近蓋了一座新公園。", en: "A new park has recently been built in the neighborhood where we live.", alt: ["A new park was recently built in the neighborhood where we live.", "A new park has recently been built in our neighborhood.", "They've recently built a new park in our neighborhood."], note: "被動完成式 has been built；the neighborhood where we live" }
         ]
       }
     ]
   },
   {
-    id: 4, name: "中高級", en: "Upper-Intermediate", color: "blue",
-    desc: "職場溝通、會議、電話與 Email",
+    id: 4, name: "觀點表達", en: "Opinions & Stories", color: "blue",
+    desc: "表達觀點、比較與讓步、敘述經驗（依老師評語：討論時把句子講長）",
     topics: [
       {
-        id: "4-1", name: "職場溝通", en: "At Work",
+        id: "4x-1", name: "表達觀點", en: "Giving Opinions",
         items: [
-          { zh: "這個專案的截止日是什麼時候？", en: "When is the deadline for this project?", alt: ["What's the deadline for this project?"] },
-          { zh: "我今天下班前會完成。", en: "I'll finish it before the end of the day.", alt: ["I'll have it done by the end of the day.", "I'll get it done by the end of the day."] },
-          { zh: "你有空可以幫我看一下這份報告嗎？", en: "Do you have time to look over this report?", alt: ["Could you take a look at this report when you're free?", "Do you have a minute to look at this report?"] },
-          { zh: "我需要多一點時間。", en: "I need a little more time.", alt: ["I need a bit more time.", "I need more time."] },
-          { zh: "我們應該優先處理這個問題。", en: "We should make this issue a priority.", alt: ["We should prioritize this issue.", "We should deal with this issue first."] },
-          { zh: "抱歉，我沒有跟上，可以再說一次嗎？", en: "Sorry, I didn't catch that. Could you say it again?", alt: ["Sorry, I didn't catch that. Could you repeat that?"] },
-          { zh: "我會再跟你確認。", en: "I'll get back to you.", alt: ["I'll double-check and get back to you."] },
-          { zh: "這不在我的負責範圍內。", en: "That's not my responsibility.", alt: ["That's outside my responsibilities.", "That's not part of my job."] },
-          { zh: "我想跟你討論一下我的工作量。", en: "I'd like to talk to you about my workload.", alt: ["I'd like to discuss my workload with you."] },
-          { zh: "謝謝你在這個專案上的努力。", en: "Thanks for all your hard work on this project.", alt: ["Thank you for your hard work on this project."] },
-          { zh: "我們需要在預算內完成。", en: "We need to finish it within budget.", alt: ["We need to stay within budget.", "We need to get it done within budget."] },
-          { zh: "如果有任何問題，隨時告訴我。", en: "Let me know if you have any questions.", alt: ["If you have any questions, just let me know.", "Feel free to let me know if you have any questions."] }
+          { zh: "在我看來，在家工作的好處遠大於壞處。", en: "In my view, the benefits of working from home far outweigh the drawbacks.", alt: ["In my opinion, the benefits of working from home far outweigh the drawbacks.", "In my opinion, the advantages of working from home far outweigh the disadvantages.", "From my point of view, the benefits of working from home far outweigh the drawbacks."], note: "outweigh = 勝過；far 加強語氣" },
+          { zh: "我認為學校應該教更多實用的技能，例如理財和烹飪。", en: "I think schools should teach more practical skills, such as managing money and cooking.", alt: ["I think schools should teach more practical skills, like managing money and cooking.", "I believe schools should teach more practical skills, such as managing money and cooking.", "In my opinion, schools should teach more practical skills, such as money management and cooking."], note: "such as / like + 例子；skills 複數" },
+          { zh: "我部分同意你的看法，但我不認為這是唯一的原因。", en: "I agree with you to some extent, but I don't think that's the only reason.", alt: ["I partly agree with you, but I don't think that's the only reason.", "I agree with you to a certain extent, but I don't think that's the only reason.", "I agree with you to some extent, but I don't think it's the only reason."], note: "to some extent = 某種程度上；否定放在 I don't think" },
+          { zh: "你說的有道理，不過我想從另一個角度來看這件事。", en: "You have a point, but I'd like to look at this from a different angle.", alt: ["You have a point, but I'd like to look at it from a different angle.", "You've got a point, but I'd like to look at this from another angle.", "That makes sense, but I'd like to look at this from a different perspective."], note: "You have a point = 你說得有道理" },
+          { zh: "我之所以這麼說，是因為我自己也經歷過同樣的事。", en: "The reason I say this is that I've been through the same thing myself.", alt: ["I say this because I've been through the same thing myself.", "The reason I'm saying this is that I've been through the same thing myself.", "I say this because I've experienced the same thing myself."], note: "The reason … is that…；go through → been through（經歷）" },
+          { zh: "舉例來說，很多年輕人寧願租房子，也不願意背房貸。", en: "For example, many young people would rather rent than take on a mortgage.", alt: ["For instance, many young people would rather rent than take on a mortgage.", "For example, many young people would rather rent than take out a mortgage.", "For example, a lot of young people would rather rent than take on a mortgage."], note: "would rather A than B（A、B 都用原形動詞）" },
+          { zh: "坦白說，我不太確定這個計畫在現實中行不行得通。", en: "To be honest, I'm not sure this plan would work in reality.", alt: ["To be honest, I'm not sure this plan would work in practice.", "Honestly, I'm not sure this plan would work in reality.", "To be honest, I'm not sure whether this plan would work in reality."], note: "would work = 假如實行的話會不會成功（語氣較委婉）" },
+          { zh: "我想強調的是，這不只是錢的問題。", en: "What I want to emphasize is that this isn't just about money.", alt: ["What I'd like to stress is that this isn't just about money.", "What I want to stress is that this isn't just about money.", "What I want to emphasize is that it's not just about money."], note: "What I want to emphasize is that…（強調句型）" },
+          { zh: "根據我的經驗，提早規劃總是能省下不少麻煩。", en: "In my experience, planning ahead always saves a lot of trouble.", alt: ["From my experience, planning ahead always saves a lot of trouble.", "In my experience, planning ahead always saves you a lot of trouble.", "In my experience, planning early always saves a lot of trouble."], note: "動名詞當主詞：planning ahead + 單數動詞 saves" },
+          { zh: "我們不該只看短期利益，也要考慮長期的影響。", en: "We shouldn't only look at short-term gains; we also need to consider the long-term effects.", alt: ["We shouldn't just look at short-term gains; we also need to consider the long-term effects.", "We shouldn't only look at short-term benefits; we also need to consider the long-term impact.", "We shouldn't only look at short-term gains. We also have to consider the long-term effects."], note: "short-term / long-term 當形容詞要加連字號" },
+          { zh: "如果要我選，我會選薪水較低但時間比較彈性的工作。", en: "If I had to choose, I'd go for a job with lower pay but more flexible hours.", alt: ["If I had to choose, I'd choose a job with lower pay but more flexible hours.", "If I had to choose, I'd pick a job with lower pay but more flexible hours.", "If I had to choose, I would choose a job with a lower salary but more flexible hours."], note: "If I had to…, I'd…（用假設語氣表達偏好）" },
+          { zh: "總而言之，我相信只要我們用得聰明，科技的好處會多於壞處。", en: "All in all, I believe technology does more good than harm, as long as we use it wisely.", alt: ["In conclusion, I believe technology does more good than harm, as long as we use it wisely.", "Overall, I believe technology does more good than harm, as long as we use it wisely.", "All in all, I believe technology does more good than harm as long as we use it wisely."], note: "as long as = 只要；does more good than harm" }
         ]
       },
       {
-        id: "4-2", name: "開會討論", en: "Meetings",
+        id: "4x-2", name: "比較與讓步", en: "Comparing & Conceding",
         items: [
-          { zh: "我們開始吧。", en: "Let's get started." },
-          { zh: "今天會議的目的是討論新產品。", en: "The purpose of today's meeting is to discuss the new product.", alt: ["Today's meeting is to discuss the new product."] },
-          { zh: "我可以補充一點嗎？", en: "Can I add something?", alt: ["May I add something?", "Could I add something?"] },
-          { zh: "我同意你的看法。", en: "I agree with you.", alt: ["I agree with your point."] },
-          { zh: "我不太確定這是最好的做法。", en: "I'm not sure this is the best approach.", alt: ["I'm not sure that's the best way to do it."] },
-          { zh: "你可以說得更具體一點嗎？", en: "Could you be more specific?", alt: ["Can you be more specific?"] },
-          { zh: "我們有點離題了。", en: "We're getting off topic.", alt: ["We're getting a little off topic.", "We're getting off track."] },
-          { zh: "我們把這個問題留到下次會議討論。", en: "Let's discuss this at the next meeting.", alt: ["Let's save this for the next meeting."] },
-          { zh: "誰負責這項任務？", en: "Who's in charge of this task?", alt: ["Who is responsible for this task?"] },
-          { zh: "我們時間快到了。", en: "We're running out of time.", alt: ["We're almost out of time."] },
-          { zh: "我來總結一下今天的重點。", en: "Let me sum up today's key points.", alt: ["Let me summarize the main points from today."] },
-          { zh: "我會在會後寄出會議記錄。", en: "I'll send out the meeting notes afterward.", alt: ["I'll send the minutes after the meeting.", "I'll send out the meeting notes after the meeting."] }
+          { zh: "我哥哥很外向，而我比較安靜內向。", en: "My brother is very outgoing, whereas I'm quieter and more introverted.", alt: ["My brother is very outgoing, while I'm quieter and more introverted.", "My brother is very outgoing, whereas I'm more quiet and introverted.", "My brother is really outgoing, while I'm quieter and more introverted."], note: "whereas / while = 而（對比兩件事）" },
+          { zh: "儘管下著大雨，還是有好幾千人來參加演唱會。", en: "Despite the heavy rain, thousands of people came to the concert.", alt: ["In spite of the heavy rain, thousands of people came to the concert.", "Even though it was raining heavily, thousands of people came to the concert.", "Despite the heavy rain, thousands of people attended the concert."], note: "despite / in spite of + 名詞；even though + 子句" },
+          { zh: "跟十年前相比，現在的人花更多時間在網路上。", en: "Compared with ten years ago, people spend more time online now.", alt: ["Compared to ten years ago, people spend more time online now.", "Compared to ten years ago, people now spend more time online.", "People spend more time online now than they did ten years ago."], note: "compared with / to…；than they did（用 did 代替前面的動詞）" },
+          { zh: "這次的考試沒有我預期的那麼難。", en: "The exam wasn't as difficult as I had expected.", alt: ["The exam wasn't as hard as I expected.", "The exam wasn't as difficult as I expected.", "The test wasn't as hard as I had expected."], note: "not as + 原級 + as；had expected（預期發生在考試之前）" },
+          { zh: "城市生活雖然方便，但壓力也大得多。", en: "City life may be convenient, but it's also much more stressful.", alt: ["Although city life is convenient, it's also much more stressful.", "City life is convenient, but it's also much more stressful.", "Life in the city may be convenient, but it's also a lot more stressful."], note: "may be…, but… = 雖然…但是…；much + 比較級" },
+          { zh: "他賺的錢是我的兩倍，但他工作的時間也長很多。", en: "He earns twice as much as I do, but he also works much longer hours.", alt: ["He earns twice as much as me, but he also works much longer hours.", "He makes twice as much as I do, but he also works much longer hours.", "He earns twice as much money as I do, but he also works a lot longer hours."], note: "twice as much as… = 是…的兩倍" },
+          { zh: "無論天氣如何，他每天早上都會去跑步。", en: "No matter what the weather is like, he goes running every morning.", alt: ["Whatever the weather, he goes running every morning.", "Regardless of the weather, he goes running every morning.", "No matter what the weather is like, he goes for a run every morning."], note: "No matter what… / Regardless of…；goes 第三人稱加 s" },
+          { zh: "即使他道歉了，我還是很難再相信他。", en: "Even though he apologized, it's still hard for me to trust him again.", alt: ["Even though he apologized, I still find it hard to trust him again.", "Although he apologized, it's still hard for me to trust him again.", "Even though he said sorry, it's still hard for me to trust him again."], note: "even though + 已發生的事；it's hard for me to…" },
+          { zh: "這支手機雖然比較貴，但品質好太多了。", en: "Although this phone is more expensive, its quality is much better.", alt: ["Although this phone is more expensive, the quality is much better.", "This phone is more expensive, but the quality is much better.", "Even though this phone is more expensive, its quality is far better."], note: "much / far + 比較級 = …得多" },
+          { zh: "網購比去實體店方便，但你沒辦法先試穿。", en: "Shopping online is more convenient than going to a store, but you can't try things on first.", alt: ["Online shopping is more convenient than going to a store, but you can't try things on first.", "Shopping online is more convenient than going to a shop, but you can't try things on first.", "Online shopping is more convenient than going to a physical store, but you can't try things on first."], note: "動名詞比較：shopping … than going；try things on" },
+          { zh: "這兩個方案各有優缺點，很難說哪一個比較好。", en: "Both plans have their pros and cons, so it's hard to say which one is better.", alt: ["Each plan has its pros and cons, so it's hard to say which one is better.", "Both plans have their own pros and cons, so it's hard to say which one is better.", "Both plans have advantages and disadvantages, so it's hard to say which one is better."], note: "pros and cons = 優缺點；which one is better（間接問句）" },
+          { zh: "這間餐廳越來越受歡迎，現在幾乎每天都要排隊。", en: "This restaurant is getting more and more popular; now you have to wait in line almost every day.", alt: ["This restaurant is becoming more and more popular; now you have to wait in line almost every day.", "This restaurant is getting more and more popular, and now you have to queue almost every day.", "This restaurant has become more and more popular, and now you have to wait in line almost every day."], note: "more and more + 形容詞 = 越來越…" }
         ]
       },
       {
-        id: "4-3", name: "電話與 Email", en: "Calls & Emails",
+        id: "4x-3", name: "敘述經驗", en: "Telling Stories",
         items: [
-          { zh: "請問哪裡找？", en: "May I ask who's calling?", alt: ["Who's calling, please?"] },
-          { zh: "請稍等，我幫你轉接。", en: "Please hold, I'll put you through.", alt: ["Hold on, I'll transfer you.", "Please hold while I transfer you."] },
-          { zh: "他現在不在座位上。", en: "He's not at his desk right now.", alt: ["He is away from his desk right now."] },
-          { zh: "需要幫你留言嗎？", en: "Would you like to leave a message?", alt: ["Can I take a message?"] },
-          { zh: "收訊不太好，你聽得到我嗎？", en: "The connection is bad. Can you hear me?", alt: ["The reception is bad. Can you hear me?"] },
-          { zh: "我晚點再打給你。", en: "I'll call you back later." },
-          { zh: "附件是本月的報告。", en: "Please find attached this month's report.", alt: ["Attached is this month's report.", "I've attached this month's report."] },
-          { zh: "感謝你的快速回覆。", en: "Thank you for your quick reply.", alt: ["Thanks for your quick reply.", "Thank you for your prompt reply."] },
-          { zh: "我寫信是想詢問訂單的狀況。", en: "I'm writing to ask about the status of my order.", alt: ["I'm writing to inquire about the status of my order."] },
-          { zh: "很抱歉這麼晚才回覆你。", en: "Sorry for the late reply.", alt: ["I'm sorry for the late reply.", "Sorry for getting back to you so late."] },
-          { zh: "期待你的回覆。", en: "I look forward to hearing from you.", alt: ["Looking forward to hearing from you.", "I look forward to your reply."] },
-          { zh: "如果需要任何進一步的資訊，請告訴我。", en: "Please let me know if you need any further information.", alt: ["Let me know if you need any more information."] }
+          { zh: "回想起來，那次失敗教會了我很多東西。", en: "Looking back, that failure taught me a lot.", alt: ["Looking back, I learned a lot from that failure.", "In hindsight, that failure taught me a lot.", "Looking back, that failure taught me so much."], note: "teach → taught（不規則）；Looking back = 回想起來" },
+          { zh: "我還沒來得及說話，他就把電話掛了。", en: "Before I could say anything, he hung up.", alt: ["He hung up before I could say anything.", "Before I could say a word, he hung up.", "Before I had a chance to say anything, he hung up."], note: "hang up → hung up（掛電話）；before I could…" },
+          { zh: "正當我準備出門的時候，突然停電了。", en: "Just as I was about to leave, the power suddenly went out.", alt: ["Just as I was about to go out, the power suddenly went out.", "Just as I was about to leave, the power went out.", "Just as I was about to leave, the electricity suddenly went out."], note: "be about to = 正要…；go out → went out（停電）" },
+          { zh: "我們迷路了，幸好一位當地人好心帶我們回到飯店。", en: "We got lost, but luckily a local kindly took us back to our hotel.", alt: ["We got lost, but luckily a local kindly took us back to the hotel.", "We got lost, but fortunately a local kindly took us back to our hotel.", "We got lost, but luckily a local person kindly walked us back to the hotel."], note: "get lost → got lost；take → took（不規則）" },
+          { zh: "那是我第一次一個人出國，所以我又興奮又緊張。", en: "It was my first time traveling abroad alone, so I was both excited and nervous.", alt: ["It was my first time going abroad alone, so I was both excited and nervous.", "It was the first time I had traveled abroad alone, so I was both excited and nervous.", "It was my first time traveling abroad by myself, so I was both excited and nervous."], note: "both A and B；人的感受用 -ed（excited）" },
+          { zh: "我到機場的時候，才發現把護照留在家裡了。", en: "When I got to the airport, I realized I had left my passport at home.", alt: ["When I got to the airport, I realized I'd left my passport at home.", "When I arrived at the airport, I realized that I had left my passport at home.", "It wasn't until I got to the airport that I realized I had left my passport at home."], note: "比「發現」更早發生 → 過去完成式 had left" },
+          { zh: "等我們到的時候，所有的票都已經賣光了。", en: "By the time we arrived, all the tickets had already sold out.", alt: ["By the time we got there, all the tickets had already sold out.", "By the time we arrived, all the tickets had already been sold.", "By the time we got there, all the tickets had sold out."], note: "by the time + 過去式，主句用過去完成式 had sold out" },
+          { zh: "我們聊得太開心，完全忘了時間。", en: "We were having such a good time talking that we completely lost track of time.", alt: ["We were having so much fun talking that we completely lost track of time.", "We were enjoying our conversation so much that we completely lost track of time.", "We had such a good time talking that we completely lost track of time."], note: "such a + 形容詞 + 名詞 + that…；lose track of time = 忘了時間" },
+          { zh: "我們已經走了三個小時，才終於看到山頂。", en: "We had been walking for three hours before we finally saw the top of the mountain.", alt: ["We'd been walking for three hours before we finally saw the top of the mountain.", "We had been hiking for three hours before we finally saw the summit.", "We had walked for three hours before we finally saw the top of the mountain."], note: "過去完成進行式 had been walking：在過去某時刻之前一直持續" },
+          { zh: "直到我搬出去住，我才明白父母有多辛苦。", en: "It wasn't until I moved out that I realized how hard my parents had worked.", alt: ["I didn't realize how hard my parents worked until I moved out.", "It wasn't until I moved out that I realized how hard my parents worked.", "Not until I moved out did I realize how hard my parents had worked."], note: "It wasn't until… that… = 直到…才…" },
+          { zh: "那天天氣糟透了，不但下大雨，還颳著強風。", en: "The weather was terrible that day; not only was it pouring, but it was also very windy.", alt: ["The weather was terrible that day; it was not only pouring but also very windy.", "The weather was awful that day; it was not only raining heavily but also very windy.", "The weather was terrible that day, with heavy rain and strong winds."], note: "not only… but also…；放句首要倒裝（not only was it…）" },
+          { zh: "如果那天我沒錯過那班公車，我們可能永遠不會認識。", en: "If I hadn't missed that bus that day, we might never have met.", alt: ["If I had not missed that bus that day, we might never have met.", "Had I not missed that bus that day, we might never have met.", "If I hadn't missed the bus that day, we might never have met."], note: "與過去相反：If + hadn't + 過去分詞, might never have + 過去分詞" }
         ]
       }
     ]
