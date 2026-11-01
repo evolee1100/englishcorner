@@ -194,7 +194,7 @@
             ${P.status !== "success" ? `<input class="typing-input" id="typing" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="輸入英文">` : ""}
           </div>
           ${P.revealed && P.status !== "success" ? `<div class="answer-reveal"><small class="zh">${ez("參考答案（照著打一遍）")}</small>${esc(it.en)}</div>`
-            : P.hint && P.status !== "success" ? `<div class="answer-reveal hint-box"><small class="zh">${ez("提示：每個字的首字母")}</small>${esc(maskHint(it.en))}</div>` : ""}
+            : P.hint && P.status !== "success" ? `<div class="answer-reveal hint-box"><small class="zh">${ez("提示：每個字的首字母")}</small>${esc(maskHint(it.en))}${it.note ? `<div class="grammar-note zh">📘 ${ez(it.note)}</div>` : ""}</div>` : ""}
           ${P.status === "success" ? renderResult(it) : ""}
           <div class="tools zh">
             <button class="tool" data-act="play">🔊 ${ez("發音")} <kbd>Tab</kbd></button>
@@ -218,6 +218,7 @@
         <div class="praise zh">✨ ${ez(PRAISE[Math.floor(Math.random() * PRAISE.length)])}</div>
         <div class="en-words">${it.en.split(/\s+/).map(w => `<button data-word="${esc(core(w))}">${esc(w)}</button>`).join("")}</div>
         ${typedOther ? `<div class="std zh">${ez("你的說法也對！標準答案：")}<b>${esc(it.en)}</b></div>` : ""}
+        ${it.note ? `<div class="grammar-note zh">📘 ${ez(it.note)}</div>` : ""}
         ${(it.alt || []).length ? `<div class="std zh">${ez("其他說法：")}${it.alt.map(esc).join(" ／ ")}</div>` : ""}
       </div>`;
   }

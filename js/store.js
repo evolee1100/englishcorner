@@ -127,7 +127,9 @@
     resetTopic(topicId, mode) { state.progress[topicId] && delete state.progress[topicId][mode]; save(); },
 
     stats() {
-      const totalDone = Object.keys(state.progress).reduce((n, tid) => n + this.doneCount(tid), 0);
+      // 只算題庫裡還存在的主題（舊版 Level 1–2 已移除，殘留的進度不計）
+      const live = new Set((window.LEVELS || []).flatMap(lv => lv.topics.map(t => t.id)));
+      const totalDone = Object.keys(state.progress).filter(tid => live.has(tid)).reduce((n, tid) => n + this.doneCount(tid), 0);
       let streak = 0;
       const d = new Date();
       // 今天還沒練不打斷連續紀錄，從昨天開始算

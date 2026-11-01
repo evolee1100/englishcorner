@@ -301,3 +301,8 @@ main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 64px; }
 .listen-big { position: relative; z-index: 2; }
 .slots:empty { min-height: 0; }
 .hint-box { letter-spacing: 1.5px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.grammar-note {
+  margin: 10px auto 0; max-width: 640px; padding: 8px 12px; border-radius: 10px; text-align: left;
+  font-size: 14px; font-weight: 700; letter-spacing: 0; font-family: "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  background: var(--surface-2); border-left: 4px solid var(--c1); color: var(--text);
+}
