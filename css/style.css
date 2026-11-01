@@ -18,6 +18,7 @@
   --blue-1:  #1c7ed6;  --blue-2:  var(--blue-1);
   --purple-1:#7048e8;  --purple-2:var(--purple-1);
   --teal-1:  #0c8599;  --teal-2:  var(--teal-1);
+  --rose-1:  #c2255c;  --rose-2:  var(--rose-1);
 
   --c1: var(--purple-1);
   --c2: var(--purple-2);

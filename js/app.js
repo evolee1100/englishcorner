@@ -8,7 +8,8 @@
     green: ["var(--green-1)", "var(--green-2)"],
     blue: ["var(--blue-1)", "var(--blue-2)"],
     purple: ["var(--purple-1)", "var(--purple-2)"],
-    teal: ["var(--teal-1)", "var(--teal-2)"]
+    teal: ["var(--teal-1)", "var(--teal-2)"],
+    rose: ["var(--rose-1)", "var(--rose-2)"]
   };
   const MODES = { translate: "中翻英", dictation: "聽寫" };
   const PRAISE = ["太棒了！", "完全正確！", "漂亮！", "Nice!", "Great job!", "就是這樣！", "Perfect!"];
