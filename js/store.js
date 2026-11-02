@@ -3,7 +3,8 @@
   const KEY = "ec_state_v1";
   const PREF_KEY = "ec_prefs_v1";
 
-  const empty = () => ({ progress: {}, daily: {}, updatedAt: 0 });
+  const empty = () => ({ progress: {}, daily: {}, stars: {}, updatedAt: 0 });
+  // stars["3"] = 闖關第 3 關拿到的最高星數（0–3）
   // progress[topicId][mode] = { done: [句子索引], pos: 下次從第幾句開始 }
   // daily["2026-10-24"] = 當天答對句數
 
@@ -51,6 +52,7 @@
         }
       }
       for (const [d, n] of Object.entries(src.daily || {})) out.daily[d] = Math.max(out.daily[d] || 0, n);
+      for (const [k, n] of Object.entries(src.stars || {})) out.stars[k] = Math.max(out.stars[k] || 0, n);
     }
     out.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0);
     return out;
@@ -127,6 +129,11 @@
     },
     setPos(topicId, mode, pos) { topicMode(topicId, mode).pos = pos; save(); },
     resetTopic(topicId, mode) { state.progress[topicId] && delete state.progress[topicId][mode]; save(); },
+
+    // 闖關星數：只保留最高紀錄
+    getStars(n) { return (state.stars || {})[n] || 0; },
+    setStars(n, v) { state.stars ??= {}; if (v > (state.stars[n] || 0)) { state.stars[n] = v; save(); } },
+    totalStars() { return Object.values(state.stars || {}).reduce((a, b) => a + b, 0); },
 
     stats() {
       // 只算題庫裡還存在的主題（舊版 Level 1–2 已移除，殘留的進度不計）

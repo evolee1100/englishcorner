@@ -14,8 +14,10 @@
   };
   const DIALOGS = window.DIALOGS || [];
   // 排序最簡單（字都給你，只要排順序），中翻英要自己拼，聽寫最難
-  const MODES = { tiles: "排序", translate: "中翻英", dictation: "聽寫" };
-  const MODE_ICON = { tiles: "🧩", translate: "⌨️", dictation: "🎧" };
+  const MODES = { tiles: "排序", translate: "中翻英", dictation: "聽寫", speak: "跟讀" };
+  const MODE_ICON = { tiles: "🧩", translate: "⌨️", dictation: "🎧", speak: "🎤" };
+  // 闖關只開放排序和打字：語音辨識的誤差不該扣命
+  const STAGE_MODES = ["tiles", "translate"];
   const PRAISE = ["太棒了！", "完全正確！", "漂亮！", "Nice!", "Great job!", "就是這樣！", "Perfect!"];
 
   // ---------- 繁簡轉換 ----------
@@ -58,6 +60,94 @@
     if (onEnd) u.onend = onEnd;
     speechSynthesis.speak(u);
   }
+
+  // ---------- 開口說：語音辨識（Chrome / Safari）＋錄下自己的聲音 ----------
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const canListen = !!SR;
+  // iOS 同時開語音辨識和錄音容易互搶麥克風，所以 iOS 上不錄音
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const canRecord = !isIOS && !!(navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
+  let rec = null, recorder = null, recStream = null;
+  function finishListening() { try { rec?.stop(); } catch {} }
+  function stopListening() {
+    try { rec?.abort(); } catch {}
+    rec = null;
+    try { if (recorder?.state === "recording") recorder.stop(); } catch {}
+  }
+  // 聽使用者說一句話：onInterim 即時顯示，onDone 收到最後結果，onRecording 拿到錄音網址
+  function listen(target, onInterim, onDone, onRecording) {
+    stopListening();
+    const r = new SR();
+    rec = r;
+    r.lang = (ACCENTS[S.prefs.accent] || ACCENTS.us).lang;
+    r.interimResults = true;
+    r.maxAlternatives = 3;
+    r.continuous = false;
+    const finals = [];
+    let error = "";
+    r.onresult = e => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const res = e.results[i];
+        if (res.isFinal) finals.push([...res].map(a => a.transcript));
+        else interim += res[0].transcript;
+      }
+      onInterim((finals.map(f => f[0]).join(" ") + " " + interim).trim());
+    };
+    r.onerror = e => { error = e.error; };
+    r.onend = () => {
+      if (rec !== r) return;
+      rec = null;
+      try { if (recorder?.state === "recording") recorder.stop(); } catch {}
+      // 每段取辨識器給的幾個候選，挑最接近目標句的組合
+      let heard = "";
+      for (let j = 0; j < 3; j++) {
+        const cand = finals.map(f => f[j] || f[0]).join(" ").trim();
+        if (cand && (!heard || scoreSpeech(target, cand).score > scoreSpeech(target, heard).score)) heard = cand;
+      }
+      onDone(heard, error);
+    };
+    try { r.start(); } catch { onDone("", "start-failed"); return; }
+    if (canRecord && onRecording) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        if (rec !== r) { stream.getTracks().forEach(t => t.stop()); return; }
+        recStream = stream;
+        const chunks = [];
+        recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+          if (chunks.length) onRecording(URL.createObjectURL(new Blob(chunks, { type: recorder.mimeType })));
+        };
+        recorder.start();
+      }).catch(() => {});
+    }
+  }
+  const listenError = err => ({
+    "not-allowed": "請允許瀏覽器使用麥克風（網址列左邊的設定）",
+    "service-not-allowed": "請允許瀏覽器使用麥克風",
+    "no-speech": "沒有聽到聲音，按 🎤 再說一次",
+    "audio-capture": "找不到麥克風",
+    "network": "語音辨識需要網路連線"
+  }[err] || "沒有聽清楚，按 🎤 再說一次");
+  let myAudio = null;
+  function playRecording(url) { if (!url) return; myAudio?.pause(); myAudio = new Audio(url); myAudio.play(); }
+
+  // 數字統一拼成英文字（辨識器常把 nine 寫成 9）
+  const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+  const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+  const numWord = n => n < 20 ? ONES[n] : n < 100 ? TENS[Math.floor(n / 10)] + (n % 10 ? " " + ONES[n % 10] : "") : n < 1000 ? ONES[Math.floor(n / 100)] + " hundred" + (n % 100 ? " " + numWord(n % 100) : "") : String(n);
+  const speechToks = s => norm(s).replace(/\b\d+\b/g, d => numWord(+d)).trim().split(" ").filter(Boolean);
+  // 逐字比對說出來的話：回傳每個目標字有沒有被念到，以及念到的比例
+  function scoreSpeech(target, heard) {
+    const words = target.split(/\s+/);
+    const flat = [], owner = [];
+    words.forEach((w, i) => speechToks(w).forEach(t => { flat.push(t); owner.push(i); }));
+    const keep = lcsKeep(flat, speechToks(heard));
+    const wordOk = words.map((_, i) => owner.every((o, k) => o !== i || keep.has(k)));
+    return { wordOk, score: flat.length ? keep.size / flat.length : 0 };
+  }
+  const PASS_SCORE = 0.8;
 
   // ---------- 答案比對 ----------
   function norm(s) {
@@ -116,16 +206,23 @@
         <div class="stat" ><div class="n">${st.streak} 🔥</div><div class="l zh">${ez("連續天數")}</div></div>
         <div class="stat" ><div class="n">${st.totalDone}</div><div class="l zh">${ez("已掌握句子")}</div></div>
       </section>
+      <section class="stage-entry">
+        <button class="stage-card" data-goto="#/c">
+          <span class="stage-trophy">🏆</span>
+          <span class="dlg-text"><b class="zh">${ez("闖關挑戰")}</b><small class="zh">${ez(`${STAGES.length} 關 · 每關 10 句 · 3 條命`)}</small></span>
+          <span class="stage-stars">⭐ ${S.totalStars()} / ${STAGES.length * 3}</span>
+        </button>
+      </section>
       ${DIALOGS.length ? `
       <section class="dialogs-sec">
         <h2 class="sec-title zh">💬 ${ez("對話練習")}<small>Conversation</small></h2>
-        <p class="sec-desc zh">${ez("對方說一句，你選出最恰當的回答。選錯會告訴你為什麼。")}</p>
+        <p class="sec-desc zh">${ez(canListen ? "對方說一句，你用英文把回答說出來（也可以改成用選的）。說錯會告訴你為什麼。" : "對方說一句，你選出最恰當的回答。選錯會告訴你為什麼。")}</p>
         <div class="dlg-grid">
           ${DIALOGS.map(d => `
             <button class="dlg-card" data-dlg="${esc(d.id)}">
               <span class="dlg-emoji">${d.emoji || "💬"}</span>
               <span class="dlg-text"><b class="zh">${ez(d.title)}</b><small>${esc(d.en)}</small></span>
-              ${S.getTopic("dlg-" + d.id, "dialog").done.length ? `<span class="dlg-done">✓</span>` : ""}
+              ${S.state.progress["dlg-" + d.id]?.dialog?.done.length ? `<span class="dlg-done">✓</span>` : ""}
             </button>`).join("")}
         </div>
       </section>` : ""}
@@ -163,6 +260,105 @@
       <p class="foot">English Corner v${esc(window.EC_CONFIG?.version || "")} · ${ez(S.cloudEnabled ? (S.user ? "進度已同步到雲端" : "登入後可跨裝置同步進度") : "進度儲存在這台裝置")}</p>`;
     app.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { location.hash = "#/p/" + b.dataset.go; });
     app.querySelectorAll("[data-dlg]").forEach(b => b.onclick = () => { location.hash = "#/d/" + b.dataset.dlg; });
+    app.querySelectorAll("[data-goto]").forEach(b => b.onclick = () => { location.hash = b.dataset.goto; });
+  }
+
+  // ---------- 闖關：Level 0 → 5 的句子由短到長排好，每 10 句一關 ----------
+  const STAGES = (() => {
+    const out = [];
+    for (const lv of LEVELS) {
+      if (lv.badge) continue;
+      const items = lv.topics.flatMap(tp => tp.items.map((it, idx) => ({ ...it, src: { tid: tp.id, idx } })));
+      const sorted = items.map((it, i) => ({ it, i, n: it.en.split(/\s+/).length }))
+        .sort((a, b) => a.n - b.n || a.i - b.i).map(x => x.it);
+      for (let k = 0; k < sorted.length; k += 10) out.push({ lv, items: sorted.slice(k, k + 10) });
+    }
+    return out.map((s, i) => ({ ...s, n: i + 1 }));
+  })();
+  const stageOpen = n => n === 1 || S.getStars(n - 1) > 0;
+  const starStr = n => "★".repeat(n) + "☆".repeat(3 - n);
+
+  function renderStageMap() {
+    stopTimer();
+    const mode = STAGE_MODES.includes(S.prefs.stageMode) ? S.prefs.stageMode : "tiles";
+    const groups = [];
+    for (const s of STAGES) {
+      const g = groups[groups.length - 1];
+      if (g && g.lv === s.lv) g.stages.push(s); else groups.push({ lv: s.lv, stages: [s] });
+    }
+    app.innerHTML = `
+      <section class="stagemap">
+        <div class="pbar">
+          <button class="back zh" id="back">← ${ez("首頁")}</button>
+          <div class="ptitle zh">🏆 ${ez("闖關挑戰")}<small>⭐ ${S.totalStars()} / ${STAGES.length * 3}</small></div>
+          <div class="spacer"></div>
+          <div class="seg zh">${STAGE_MODES.map(k => `<button data-smode="${k}" class="${k === mode ? "on" : ""}">${MODE_ICON[k]} ${ez(MODES[k])}</button>`).join("")}</div>
+        </div>
+        <p class="sec-desc zh">${ez("每關 10 句、3 條命：答錯或看答案扣一條命。剩幾條命就拿幾顆星，拿到星星才會開下一關。")}</p>
+        ${groups.map(g => `
+          <div class="stage-group" style="${lvStyle(g.lv)}">
+            <h3 class="zh">LEVEL ${g.lv.id} · ${ez(g.lv.name)}</h3>
+            <div class="stage-grid">
+              ${g.stages.map(s => {
+                const open = stageOpen(s.n), st = S.getStars(s.n);
+                return `<button class="stage-btn ${open ? "" : "locked"} ${st ? "cleared" : ""}" data-stage="${s.n}" ${open ? "" : "disabled"}>
+                  <b>${open ? s.n : "🔒"}</b><span class="stars">${open ? starStr(st) : ""}</span></button>`;
+              }).join("")}
+            </div>
+          </div>`).join("")}
+      </section>`;
+    document.getElementById("back").onclick = () => { location.hash = "#/"; };
+    app.querySelectorAll("[data-smode]").forEach(b => b.onclick = () => { S.prefs.stageMode = b.dataset.smode; S.savePrefs(); renderStageMap(); });
+    app.querySelectorAll("[data-stage]").forEach(b => b.onclick = () => { location.hash = `#/c/${b.dataset.stage}/${mode}`; });
+  }
+
+  function startStage(n, mode) {
+    const st = STAGES[n - 1];
+    if (!st || !stageOpen(n) || !STAGE_MODES.includes(mode)) { location.hash = "#/c"; return; }
+    P = {
+      lv: st.lv, tp: { id: "stage-" + n, name: `第 ${n} 關`, en: `Stage ${n}`, items: st.items }, mode,
+      idx: 0, input: "", status: "typing", attempts: 0, revealed: false, hint: false, feedback: "", marks: [],
+      session: { firstTry: 0, finished: 0, start: Date.now() },
+      challenge: { n, lives: 3 }
+    };
+    if (mode === "tiles") resetTiles();
+    startClock();
+    renderPractice();
+  }
+  // 闖關扣命；命用完就結束這關。回傳 true 代表這關已經結束
+  function loseLife() {
+    if (!P.challenge) return false;
+    P.challenge.lives--;
+    if (P.challenge.lives > 0) return false;
+    renderStageResult(false);
+    return true;
+  }
+  function renderStageResult(win) {
+    stopTimer();
+    speechSynthesis?.cancel();
+    const { n, lives } = P.challenge;
+    const stars = win ? lives : 0;
+    if (win) S.setStars(n, stars);
+    const nextOpen = win && STAGES[n];
+    app.innerHTML = `
+      <section class="practice" style="${lvStyle(P.lv)}">
+        <div class="stage done-card" id="done-card">
+          <div class="big">${win ? "🏆" : "💔"}</div>
+          <h2 class="zh">${ez(win ? `第 ${n} 關過關！` : `第 ${n} 關挑戰失敗`)}</h2>
+          ${win ? `<div class="result-stars">${starStr(stars)}</div>` : ""}
+          <p class="zh" style="color:var(--muted)">${ez(win
+            ? (stars === 3 ? "零失誤，完美過關！" : "過關了！想拿滿三顆星可以再挑戰一次。")
+            : (P.mode === "translate" ? "三條命用完了。可以先換成 🧩 排序 模式熟悉這些句子。" : "三條命用完了，再試一次！"))}</p>
+          <div class="done-actions zh">
+            ${nextOpen ? `<button class="btn lg" id="nextstage">➡️ ${ez("下一關")}</button>` : ""}
+            <button class="btn lg ${nextOpen ? "ghost" : ""}" id="again">🔁 ${ez(win ? "再挑戰一次" : "再試一次")}</button>
+            <button class="btn lg ghost" id="map">🗺 ${ez("關卡地圖")}</button>
+          </div>
+        </div>
+      </section>`;
+    document.getElementById("again").onclick = () => startStage(n, P.mode);
+    document.getElementById("map").onclick = () => { location.hash = "#/c"; };
+    if (nextOpen) document.getElementById("nextstage").onclick = () => { location.hash = `#/c/${n + 1}/${P.mode}`; };
   }
 
   // ---------- 練習頁 ----------
@@ -181,13 +377,17 @@
       session: { firstTry: 0, finished: 0, start: Date.now() }
     };
     if (mode === "tiles") resetTiles();
+    if (mode === "speak") resetSay();
+    startClock();
+    renderPractice();
+    if (mode === "dictation") setTimeout(() => speak(item().en), 350);
+  }
+  function startClock() {
     stopTimer();
     timer = setInterval(() => {
       const el = document.getElementById("clock");
-      if (el) el.textContent = fmtTime(Math.floor((Date.now() - P.session.start) / 1000));
+      if (el && P) el.textContent = fmtTime(Math.floor((Date.now() - P.session.start) / 1000));
     }, 1000);
-    renderPractice();
-    if (mode === "dictation") setTimeout(() => speak(item().en), 350);
   }
   const item = () => P.tp.items[P.idx];
 
@@ -219,6 +419,7 @@
     P.input = built.join(" ");
     if (built.length === P.words.length && isCorrect(P.input, it)) { succeed(it); return; }
     P.attempts++;
+    if (loseLife()) return;
     P.tileMarks = built.map((x, i) => wordKey(x) === wordKey(P.words[i]));
     if (P.attempts >= 3) P.revealed = true;
     renderPractice();
@@ -232,18 +433,22 @@
     const it = item();
     const dict = mode === "dictation";
     const tiles = mode === "tiles";
-    const doneSet = new Set(S.getTopic(tp.id, mode).done);
+    const say = mode === "speak";
+    const ch = P.challenge;
+    // 闖關的虛擬主題不寫進進度；進度點用「已經答過幾句」表示
+    const doneSet = ch ? new Set([...Array(P.idx).keys()]) : new Set(S.getTopic(tp.id, mode).done);
     app.innerHTML = `
       <section class="practice" style="${lvStyle(lv)}">
         <div class="pbar">
           <button class="back zh" id="back">← ${ez("首頁")}</button>
-          <div class="ptitle zh">${lv.badge ? esc(lv.badge) : "L" + lv.id} · ${ez(tp.name)}<small>${esc(tp.en)}</small></div>
+          <div class="ptitle zh">${ch ? "🏆" : lv.badge ? esc(lv.badge) : "L" + lv.id} · ${ez(tp.name)}<small>${esc(tp.en)}</small></div>
           <div class="spacer"></div>
           <span class="pill">${P.idx + 1}/${tp.items.length}</span>
           <span class="pill">⏱ <span id="clock">${fmtTime(Math.floor((Date.now() - P.session.start) / 1000))}</span></span>
           <div class="seg zh">
-            ${Object.entries(MODES).map(([k, v]) => `<button data-mode="${k}" class="${k === mode ? "on" : ""}">${ez(v)}</button>`).join("")}
+            ${Object.entries(MODES).filter(([k]) => !ch || STAGE_MODES.includes(k)).map(([k, v]) => `<button data-mode="${k}" class="${k === mode ? "on" : ""}">${ez(v)}</button>`).join("")}
           </div>
+          ${ch ? `<span class="pill lives" title="${ez("剩下的命")}">${"❤️".repeat(ch.lives)}${"🤍".repeat(3 - ch.lives)}</span>` : ""}
           <div class="seg zh" title="${ez("發音口音")}">
             <button data-accent="us" class="${S.prefs.accent !== "uk" ? "on" : ""}">🇺🇸 ${ez("美式")}</button>
             <button data-accent="uk" class="${S.prefs.accent === "uk" ? "on" : ""}">🇬🇧 ${ez("英式")}</button>
@@ -258,9 +463,9 @@
               ? `<button class="listen-big" id="listen-big" aria-label="播放">🔊</button>
                  <div class="prompt-sub zh">${ez("聽發音，打出你聽到的英文")}</div>`
               : `<p class="prompt-zh zh">${ez(it.zh)}</p>
-                 <div class="prompt-sub zh">${ez(dict ? "聽寫完成" : tiles ? "把英文字排成正確的順序" : "請用英文打出來")}</div>`}
-            ${tiles && P.status !== "success" ? renderTiles() : `<div class="slots" id="slots"></div>`}
-            ${P.status !== "success" && !tiles ? `<input class="typing-input" id="typing" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="輸入英文">` : ""}
+                 <div class="prompt-sub zh">${ez(dict ? "聽寫完成" : tiles ? "把英文字排成正確的順序" : say ? "先聽一遍，再按 🎤 跟著說" : "請用英文打出來")}</div>`}
+            ${say && P.status !== "success" ? renderSay() : tiles && P.status !== "success" ? renderTiles() : `<div class="slots" id="slots"></div>`}
+            ${P.status !== "success" && !tiles && !say ? `<input class="typing-input" id="typing" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="輸入英文">` : ""}
           </div>
           ${P.feedback && P.status !== "success" ? `<div class="feedback-box zh">⚠️ ${ez(P.feedback)}</div>` : ""}
           ${P.revealed && P.status !== "success" ? `<div class="answer-reveal"><small class="zh">${ez("參考答案（照著打一遍）")}</small>${esc(it.en)}</div>`
@@ -272,10 +477,12 @@
             ${P.status === "success"
               ? `<button class="tool" data-act="next">➡️ ${ez("下一句")} <kbd>Enter</kbd></button>`
               : `${tiles ? `<button class="tool" data-act="clear">↩️ ${ez("清除")} <kbd>⌫</kbd></button>` : ""}
-                 <button class="tool" data-act="reveal">👀 ${ez("看答案")} <kbd>Esc</kbd></button>
-                 <button class="tool" data-act="skip">⏭ ${ez("略過")}</button>`}
+                 ${say ? "" : `<button class="tool" data-act="reveal">👀 ${ez(ch ? "看答案（扣 ❤️）" : "看答案")} <kbd>Esc</kbd></button>`}
+                 ${ch ? "" : `<button class="tool" data-act="skip">⏭ ${ez("略過")}</button>`}`}
           </div>
-          <div class="hint zh">${ez(tiles
+          <div class="hint zh">${ez(say
+            ? "先按 🔊 聽（念不順就用 🐢 慢速），再按 🎤 把整句念出來。念對八成以上的字就過關；紅色的字點一下可以聽它的發音。"
+            : tiles
             ? "依中文意思點英文字排成句子，點上面排好的字可以拿回來。全部排完會自動檢查。"
             : "單字之間按空白鍵，點字或用 ← → 移動游標修改，打完按 Enter 檢查。大小寫和標點不影響對錯；I'm 和 I am 算一樣，但要注意 I'm = I am，不等於 I。")}</div>
         </div>
@@ -284,13 +491,57 @@
     renderSlots();
   }
 
+  function resetSay() { P.say = { listening: false, heard: "", wordOk: null, score: null, url: null }; }
+  function renderSay() {
+    const it = item();
+    const s = P.say || {};
+    const words = it.en.split(/\s+/);
+    if (!canListen) return `
+      <div class="say-target">${words.map(w => `<button class="say-word" data-word="${esc(core(w))}">${esc(w)}</button>`).join("")}</div>
+      <div class="feedback-box zh">⚠️ ${ez("這個瀏覽器不支援語音辨識（請用 Chrome 或 Safari）。可以先聽 🔊 跟著大聲念，念完自己按「我念完了」。")}</div>
+      <div class="mic-row"><button class="btn" data-act="selfok">✓ ${ez("我念完了")}</button></div>`;
+    return `
+      <div class="say-target">${words.map((w, i) => `<button class="say-word ${s.wordOk ? (s.wordOk[i] ? "right" : "wrong") : ""}" data-word="${esc(core(w))}">${esc(w)}</button>`).join("")}</div>
+      <div class="mic-row">
+        <button class="mic ${s.listening ? "on" : ""}" id="mic" aria-label="${ez(s.listening ? "停止" : "開始說")}">${s.listening ? "■" : "🎤"}</button>
+      </div>
+      <div class="heard zh" id="heard">${s.listening ? ez("聆聽中…請把整句念出來") + (s.heard ? `<b>${esc(s.heard)}</b>` : "") : s.heard ? `${ez("辨識到：")}<b>${esc(s.heard)}</b>` : ez("按 🎤 開始說")}</div>
+      ${s.score != null ? `<div class="say-score zh ${s.score >= PASS_SCORE ? "ok" : ""}">${ez("念對")} ${Math.round(s.score * 100)}%（${ez("需要 80%")}）</div>` : ""}
+      ${s.url ? `<div class="mic-row"><button class="tool" data-act="playme">▶️ ${ez("聽我的錄音")}</button><button class="tool" data-act="play">🔊 ${ez("聽標準發音")}</button></div>` : ""}`;
+  }
+  function startSay() {
+    const it = item();
+    if (P.say.listening) { finishListening(); return; }
+    speechSynthesis?.cancel();
+    Object.assign(P.say, { listening: true, heard: "", wordOk: null, score: null });
+    renderPractice();
+    listen(it.en,
+      interim => { if (!P?.say?.listening) return; P.say.heard = interim; const h = document.getElementById("heard"); if (h) h.innerHTML = `${ez("聆聽中…請把整句念出來")}<b>${esc(interim)}</b>`; },
+      (heard, err) => {
+        if (!P || P.mode !== "speak" || item() !== it) return;
+        P.say.listening = false;
+        if (!heard) { P.say.heard = ""; renderPractice(); toast(z(listenError(err))); return; }
+        const sc = scoreSpeech(it.en, heard);
+        Object.assign(P.say, { heard, wordOk: sc.wordOk, score: sc.score });
+        P.input = heard;
+        if (sc.score >= PASS_SCORE) { succeed(it); return; }
+        P.attempts++;
+        renderPractice();
+        toast(z("紅色的字沒聽清楚，點它聽發音，再按 🎤 試一次"));
+      },
+      url => { if (P?.say) { P.say.url = url; if (P.mode === "speak") renderPractice(); } });
+  }
+
   function renderResult(it) {
-    const typedOther = P.input.trim() && norm(P.input) !== norm(it.en);
+    const typedOther = P.mode !== "speak" && P.input.trim() && norm(P.input) !== norm(it.en);
+    const sayInfo = P.mode === "speak" && P.say?.heard
+      ? `<div class="std zh">🎤 ${ez("辨識到：")}<b>${esc(P.say.heard)}</b>（${Math.round(P.say.score * 100)}%）${P.say.url ? ` <button class="tool inline" data-act="playme">▶️ ${ez("聽我的錄音")}</button>` : ""}</div>` : "";
     return `
       <div class="result">
         <div class="praise zh">✨ ${ez(PRAISE[Math.floor(Math.random() * PRAISE.length)])}</div>
         <div class="en-words">${it.en.split(/\s+/).map(w => `<button data-word="${esc(core(w))}">${esc(w)}</button>`).join("")}</div>
         ${typedOther ? `<div class="std zh">${ez("你的說法也對！標準答案：")}<b>${esc(it.en)}</b></div>` : ""}
+        ${sayInfo}
         ${it.note ? `<div class="grammar-note zh">📘 ${ez(it.note)}</div>` : ""}
         ${(it.alt || []).length ? `<div class="std zh">${ez("其他說法：")}${it.alt.map(esc).join(" ／ ")}</div>` : ""}
       </div>`;
@@ -329,10 +580,15 @@
   }
 
   function bindPractice() {
-    document.getElementById("back").onclick = () => { location.hash = "#/"; };
+    document.getElementById("back").onclick = () => { stopListening(); location.hash = P.challenge ? "#/c" : "#/"; };
     app.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => {
-      if (b.dataset.mode !== P.mode) location.hash = `#/p/${P.tp.id}/${b.dataset.mode}`;
+      if (b.dataset.mode === P.mode) return;
+      stopListening();
+      if (P.challenge) { S.prefs.stageMode = b.dataset.mode; S.savePrefs(); location.hash = `#/c/${P.challenge.n}/${b.dataset.mode}`; }
+      else location.hash = `#/p/${P.tp.id}/${b.dataset.mode}`;
     });
+    const mic = document.getElementById("mic");
+    if (mic) mic.onclick = startSay;
     document.getElementById("auto").onchange = e => { S.prefs.autoSpeak = e.target.checked; S.savePrefs(); };
     app.querySelectorAll("[data-accent]").forEach(b => b.onclick = () => {
       S.prefs.accent = b.dataset.accent;
@@ -460,8 +716,14 @@
     const it = item();
     if (a === "play") { speak(it.en); focusInput(); }
     else if (a === "slow") { speak(it.en, .65); focusInput(); }
-    else if (a === "reveal") { P.revealed = true; renderPractice(); }
-    else if (a === "skip") { next(); }
+    else if (a === "reveal") {
+      if (P.revealed || P.mode === "speak") return;
+      if (loseLife()) return;
+      P.revealed = true; renderPractice();
+    }
+    else if (a === "skip") { if (!P.challenge) next(); }
+    else if (a === "playme") { playRecording(P.say?.url); }
+    else if (a === "selfok") { P.input = it.en; succeed(it); }
     else if (a === "next") { next(); }
     else if (a === "clear") { P.placed = []; P.tileMarks = null; renderPractice(); }
     else if (a === "check") {
@@ -475,6 +737,7 @@
     if (!P.input.trim()) { focusInput(); return; }
     P.attempts++;
     if (isCorrect(P.input, it)) { succeed(it); return; }
+    if (loseLife()) return;
     // 逐字標示對錯：用最長共同子序列對齊，多打或漏打一個字不會讓後面全部變紅
     // 先把縮寫展開（I'm → i am）再比，這樣 I am 和 I'm 會被當成一樣
     const toks = str => norm(str).trim().split(" ").filter(Boolean);
@@ -507,8 +770,8 @@
     P.status = "success";
     if (P.attempts <= 1 && !P.revealed) P.session.firstTry++;
     P.session.finished++;
-    S.markDone(P.tp.id, P.mode, P.idx);
-    S.setPos(P.tp.id, P.mode, P.idx + 1);
+    if (P.challenge) S.markDone(it.src.tid, P.mode, it.src.idx);
+    else { S.markDone(P.tp.id, P.mode, P.idx); S.setPos(P.tp.id, P.mode, P.idx + 1); }
     renderPractice();
     document.getElementById("stage").classList.add("success");
     if (S.prefs.autoSpeak || P.mode === "dictation") speak(it.en);
@@ -554,14 +817,17 @@
 
   function next() {
     speechSynthesis?.cancel();
+    stopListening();
     if (P.idx + 1 >= P.tp.items.length) {
+      if (P.challenge) { renderStageResult(true); return; }
       S.setPos(P.tp.id, P.mode, 0);
       renderDone();
       return;
     }
-    if (P.status !== "success") S.setPos(P.tp.id, P.mode, P.idx + 1);
+    if (P.status !== "success" && !P.challenge) S.setPos(P.tp.id, P.mode, P.idx + 1);
     Object.assign(P, { idx: P.idx + 1, input: "", status: "typing", attempts: 0, revealed: false, hint: false, feedback: "", marks: [] });
     if (P.mode === "tiles") resetTiles();
+    if (P.mode === "speak") resetSay();
     renderPractice();
     if (P.mode === "dictation") setTimeout(() => speak(item().en), 250);
   }
@@ -572,7 +838,7 @@
     const secs = Math.floor((Date.now() - session.start) / 1000);
     const acc = session.finished ? Math.round(session.firstTry / session.finished * 100) : 0;
     const nextId = allTopics[allTopics.indexOf(tp.id) + 1];
-    const other = mode === "tiles" ? "translate" : mode === "translate" ? "dictation" : "translate";
+    const other = { tiles: "translate", translate: "speak", speak: "dictation", dictation: "translate" }[mode];
     app.innerHTML = `
       <section class="practice" style="${lvStyle(lv)}">
         <div class="stage done-card" id="done-card">
@@ -604,7 +870,7 @@
     const dlg = DIALOGS.find(d => d.id === id);
     if (!dlg) { location.hash = "#/"; return; }
     stopTimer();
-    C = { dlg, step: 0, log: [], mistakes: 0, wrong: new Set(), order: [], waiting: false };
+    C = { dlg, step: 0, log: [], mistakes: 0, wrong: new Set(), order: [], waiting: false, say: {}, showOpts: false, misses: 0 };
     advanceDialog();
   }
   // 把對方接下來說的話都放進對話紀錄，停在輪到你的地方
@@ -618,6 +884,9 @@
     }
     C.wrong = new Set();
     C.waiting = false;
+    C.say = { listening: false, heard: "", msg: "" };
+    C.showOpts = false;
+    C.misses = 0;
     C.order = C.step < lines.length ? shuffle(lines[C.step].options.map((_, i) => i)) : [];
     if (C.step >= lines.length) S.markDone("dlg-" + C.dlg.id, "dialog", 0);
     renderDialog();
@@ -634,15 +903,54 @@
       toast(z("這個不太好，看看說明再選一次"));
       return;
     }
-    C.log.push({ who: "you", en: opt.en, zh: line.zh });
+    acceptReply(i, "");
+  }
+  // 你的回答被接受：放進對話紀錄。用點的就念標準發音給你聽；用說的就直接讓對方接話
+  function acceptReply(i, heard) {
+    const line = C.dlg.lines[C.step];
+    const opt = line.options[i];
+    C.log.push({ who: "you", en: opt.en, zh: line.zh, heard });
     C.step++;
     C.waiting = true;
     renderDialog();
-    // 念完你的回答再讓對方接話；語音不支援或沒觸發 onend 時用時間保底
     let done = false;
     const go = () => { if (done || !C) return; done = true; advanceDialog(); };
+    if (heard) { setTimeout(go, 900); return; }
+    // 語音不支援或沒觸發 onend 時用時間保底
     speak(opt.en, 1, go);
     setTimeout(go, 800 + opt.en.split(/\s+/).length * 450);
+  }
+  // 用說的回答：把聽到的話跟三個選項比，最像哪一句就當作你說了哪一句
+  const answerBySpeech = () => canListen && S.prefs.dialogMode !== "choose";
+  function startDialogSay() {
+    const line = C.dlg.lines[C.step];
+    if (C.say.listening) { finishListening(); return; }
+    speechSynthesis?.cancel();
+    C.say = { listening: true, heard: "", msg: "" };
+    renderDialog();
+    const okI = line.options.findIndex(o => o.ok);
+    listen(line.options[okI].en,
+      interim => { if (!C?.say.listening) return; C.say.heard = interim; const h = document.getElementById("dlg-heard"); if (h) h.innerHTML = `${ez("聆聽中…")}<b>${esc(interim)}</b>`; },
+      (heard, err) => {
+        if (!C || C.dlg.lines[C.step] !== line) return;
+        C.say.listening = false;
+        C.say.heard = heard;
+        if (!heard) { C.say.msg = z(listenError(err)); renderDialog(); return; }
+        const scores = line.options.map(o => scoreSpeech(o.en, heard).score);
+        const best = scores.indexOf(Math.max(...scores));
+        if (scores[okI] >= 0.7 && scores[okI] >= scores[best]) { acceptReply(okI, heard); return; }
+        if (best !== okI && scores[best] >= 0.7) {
+          if (!C.wrong.has(best)) C.mistakes++;
+          C.wrong.add(best);
+          C.showOpts = true;
+          C.say.msg = z(`你說的比較像「${line.options[best].en}」：${line.options[best].why || ""}`);
+        } else {
+          C.misses++;
+          if (C.misses >= 2) C.showOpts = true;
+          C.say.msg = z(`跟恰當的回答還差一些（念對 ${Math.round(scores[okI] * 100)}%）。`) + z(C.misses >= 2 ? "看下面的選項，挑一句最恰當的念出來。" : "再說一次，或按「給我提示」。");
+        }
+        renderDialog();
+      });
   }
   function renderDialog() {
     const { dlg } = C;
@@ -662,6 +970,10 @@
             <button data-accent="us" class="${S.prefs.accent !== "uk" ? "on" : ""}">🇺🇸 ${ez("美式")}</button>
             <button data-accent="uk" class="${S.prefs.accent === "uk" ? "on" : ""}">🇬🇧 ${ez("英式")}</button>
           </div>
+          ${canListen ? `<div class="seg zh">
+            <button data-dmode="speak" class="${answerBySpeech() ? "on" : ""}">🎤 ${ez("用說的")}</button>
+            <button data-dmode="choose" class="${answerBySpeech() ? "" : "on"}">👆 ${ez("用選的")}</button>
+          </div>` : ""}
           <label class="toggle zh"><input type="checkbox" id="dlg-zh" ${showZh ? "checked" : ""}>${ez("顯示中文")}</label>
         </div>
         <div class="stage chat" id="stage">
@@ -677,10 +989,29 @@
                 </div>
               </div>` : `
               <div class="bubble-row you">
-                <div class="bubble you"><span class="en">${esc(l.en)}</span><button class="say" data-say="${k}" aria-label="播放">🔊</button></div>
+                <div class="bubble you"><span class="en">${esc(l.en)}</span><button class="say" data-say="${k}" aria-label="播放">🔊</button>${l.heard ? `<small class="heard-small">🎤 ${esc(l.heard)}</small>` : ""}</div>
               </div>`).join("")}
           </div>
-          ${turn && !C.waiting ? `
+          ${turn && !C.waiting && answerBySpeech() ? `
+            <div class="your-turn">
+              <div class="turn-prompt zh">🗣 ${ez("輪到你，用英文說：")}${ez(turn.zh)}</div>
+              <div class="mic-row"><button class="mic ${C.say.listening ? "on" : ""}" id="dlg-mic" aria-label="${ez(C.say.listening ? "停止" : "開始說")}">${C.say.listening ? "■" : "🎤"}</button></div>
+              <div class="heard zh" id="dlg-heard">${C.say.listening ? ez("聆聽中…") + (C.say.heard ? `<b>${esc(C.say.heard)}</b>` : "") : C.say.heard ? `${ez("辨識到：")}<b>${esc(C.say.heard)}</b>` : ez("按 🎤 把你的回答說出來")}</div>
+              ${C.say.msg ? `<div class="feedback-box zh">💡 ${esc(C.say.msg)}</div>` : ""}
+              ${C.showOpts ? `
+                <div class="options">
+                  ${C.order.map((i, n) => {
+                    const o = turn.options[i];
+                    const bad = C.wrong.has(i);
+                    return `<div class="opt read ${bad ? "bad" : ""}"><span class="opt-n">${n + 1}</span><span class="opt-en">${esc(o.en)}</span>
+                      <button class="say" data-opt-say="${i}" aria-label="播放">🔊</button>
+                      ${bad ? `<small class="why zh">✗ ${ez(o.why || "")}</small>` : ""}</div>`;
+                  }).join("")}
+                </div>
+                <div class="hint zh">${ez("挑一句最恰當的，按 🎤 念出來。不確定怎麼念就按 🔊 聽一次。")}</div>`
+              : `<div class="mic-row"><button class="tool" id="dlg-show">👀 ${ez("給我提示（顯示選項）")}</button></div>`}
+            </div>` : ""}
+          ${turn && !C.waiting && !answerBySpeech() ? `
             <div class="your-turn">
               <div class="turn-prompt zh">🗣 ${ez("輪到你：")}${ez(turn.zh)}</div>
               <div class="options">
@@ -708,7 +1039,7 @@
             </div>` : ""}
         </div>
       </section>`;
-    document.getElementById("back").onclick = () => { location.hash = "#/"; };
+    document.getElementById("back").onclick = () => { stopListening(); location.hash = "#/"; };
     document.getElementById("dlg-zh").onchange = e => { S.prefs.dialogZh = e.target.checked; S.savePrefs(); renderDialog(); };
     app.querySelectorAll("[data-accent]").forEach(b => b.onclick = () => {
       S.prefs.accent = b.dataset.accent; S.savePrefs(); pickVoice();
@@ -719,6 +1050,12 @@
     });
     app.querySelectorAll("[data-say]").forEach(b => b.onclick = () => speak(C.log[+b.dataset.say].en));
     app.querySelectorAll("[data-opt]").forEach(b => b.onclick = () => chooseOption(+b.dataset.opt));
+    app.querySelectorAll("[data-dmode]").forEach(b => b.onclick = () => { stopListening(); S.prefs.dialogMode = b.dataset.dmode; S.savePrefs(); C.say = { listening: false, heard: "", msg: "" }; renderDialog(); });
+    app.querySelectorAll("[data-opt-say]").forEach(b => b.onclick = () => speak(turn.options[+b.dataset.optSay].en));
+    const dmic = document.getElementById("dlg-mic");
+    if (dmic) dmic.onclick = startDialogSay;
+    const dshow = document.getElementById("dlg-show");
+    if (dshow) dshow.onclick = () => { C.showOpts = true; renderDialog(); };
     if (finished) {
       document.getElementById("again").onclick = () => startDialog(dlg.id);
       document.getElementById("home").onclick = () => { location.hash = "#/"; };
@@ -730,7 +1067,7 @@
   document.addEventListener("keydown", e => {
     if (!C || !location.hash.startsWith("#/d/") || !document.getElementById("modal").hidden) return;
     const n = +e.key;
-    if (n >= 1 && n <= C.order.length && C.step < C.dlg.lines.length && !C.waiting) {
+    if (!answerBySpeech() && n >= 1 && n <= C.order.length && C.step < C.dlg.lines.length && !C.waiting) {
       const i = C.order[n - 1];
       if (!C.wrong.has(i)) { e.preventDefault(); chooseOption(i); }
     }
@@ -829,9 +1166,18 @@
 
   // ---------- 路由 ----------
   function route(keepPractice) {
-    const m = location.hash.match(/^#\/p\/([\w-]+)\/(tiles|translate|dictation)$/);
+    stopListening();
+    const m = location.hash.match(/^#\/p\/([\w-]+)\/(tiles|translate|dictation|speak)$/);
     const d = location.hash.match(/^#\/d\/([\w-]+)$/);
-    if (m) {
+    const cs = location.hash.match(/^#\/c\/(\d+)\/(\w+)$/);
+    if (location.hash === "#/c") {
+      P = null; C = null;
+      renderStageMap();
+    } else if (cs) {
+      C = null;
+      if (keepPractice && P?.challenge?.n === +cs[1] && P.mode === cs[2]) renderPractice();
+      else startStage(+cs[1], cs[2]);
+    } else if (m) {
       C = null;
       if (keepPractice && P && P.tp.id === m[1] && P.mode === m[2]) renderPractice();
       else startPractice(m[1], m[2]);
@@ -847,7 +1193,7 @@
     window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", () => route(false));
-  S.onChange(() => { if (!/^#\/[pd]\//.test(location.hash)) renderHome(); });
+  S.onChange(() => { if (!/^#\/[pdc]/.test(location.hash)) renderHome(); });
 
   updateScriptBtn();
   updateThemeBtn();
@@ -857,6 +1203,6 @@
     updateAccountBtn();
     // 從 Email 連結回來時網址會帶 token，清掉以免殘留
     if (/access_token|error_description/.test(location.hash)) history.replaceState(null, "", location.pathname);
-    if (!/^#\/[pd]\//.test(location.hash)) renderHome();
+    if (!/^#\/[pdc]/.test(location.hash)) renderHome();
   });
 })();

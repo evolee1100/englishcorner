@@ -180,5 +180,111 @@ window.DIALOGS = [
         { en: "Finally.", why: "聽起來像在抱怨主管太晚答應，很不禮貌。" }
       ] }
     ]
+  },
+  {
+    id: "weekend", emoji: "🌤", title: "週一聊週末", en: "Small Talk About the Weekend",
+    situation: "週一早上，同事 Amy 在茶水間問你週末過得如何。",
+    lines: [
+      { who: "them", name: "Amy", en: "Morning! How was your weekend?", zh: "早安！週末過得怎麼樣？" },
+      { who: "you", zh: "說很棒，你去爬山了。", options: [
+        { en: "It was great. I went hiking.", ok: true },
+        { en: "It is great. I go hiking.", why: "週末已經過去了，要用過去式：was、went。" },
+        { en: "Why do you ask?", why: "這只是寒暄，這樣回答會讓對方覺得你不想聊。" }
+      ] },
+      { who: "them", name: "Amy", en: "Nice! Where did you go?", zh: "不錯耶！去哪裡？" },
+      { who: "you", zh: "說你去了陽明山，天氣很好。", options: [
+        { en: "I went to Yangmingshan. The weather was really nice.", ok: true },
+        { en: "I go to Yangmingshan. The weather is really nice.", why: "說的是上週末，要用過去式：went、was。" },
+        { en: "I'm went to Yangmingshan.", why: "went 是動詞，前面不加 I'm。" }
+      ] },
+      { who: "them", name: "Amy", en: "Sounds fun. I just stayed home and slept.", zh: "聽起來好好玩。我只是待在家睡覺。" },
+      { who: "you", zh: "問她：那也很好啊，有休息到嗎？", options: [
+        { en: "That sounds nice too. Did you get some rest?", ok: true },
+        { en: "That sounds nice too. Do you got some rest?", why: "問過去的事用 Did you get…?（did 後面用原形）。" },
+        { en: "That's boring.", why: "直接說別人的週末很無聊，很不禮貌。" }
+      ] },
+      { who: "them", name: "Amy", en: "Yes, I feel great now. Let's grab coffee later!", zh: "有啊，現在精神很好。晚點一起去買咖啡吧！" }
+    ]
+  },
+  {
+    id: "presentation", emoji: "🖥", title: "客戶簡報開場", en: "Opening a Client Presentation",
+    situation: "你要向客戶簡報下一季的行銷計畫，現在是開場。",
+    lines: [
+      { who: "them", name: "Client", en: "Okay, we're all here. You can start.", zh: "好，大家都到了，你可以開始了。" },
+      { who: "you", zh: "謝謝大家今天來。", options: [
+        { en: "Thank you all for coming today.", ok: true },
+        { en: "Thank you all for come today.", why: "for 後面的動詞要加 -ing：for coming。" },
+        { en: "Okay, listen to me.", why: "像在下命令，對客戶太不客氣。" }
+      ] },
+      { who: "them", name: "Client", en: "Our pleasure. What are we looking at today?", zh: "不客氣。今天要看什麼？" },
+      { who: "you", zh: "說今天要介紹下一季的行銷計畫。", options: [
+        { en: "Today I'll present our marketing plan for next quarter.", ok: true },
+        { en: "Today I present our marketing plan for last quarter.", why: "要用 I'll present；而且是下一季（next quarter），不是上一季。" },
+        { en: "Today I'm present our marketing plan.", why: "present 在這裡是動詞，前面不加 I'm。" }
+      ] },
+      { who: "them", name: "Client", en: "Great. How long will it take?", zh: "很好。大概要多久？" },
+      { who: "you", zh: "說大約二十分鐘，最後會留時間問問題。", options: [
+        { en: "About twenty minutes. I'll leave time for questions at the end.", ok: true },
+        { en: "About twenty minute. I leave time for question at the end.", why: "twenty minutes、questions 要用複數；未來的安排用 I'll leave。" },
+        { en: "I don't know. Maybe one hour.", why: "簡報者應該知道自己要講多久，這樣回答顯得沒準備。" }
+      ] },
+      { who: "them", name: "Client", en: "Perfect. Go ahead.", zh: "太好了，請開始。" }
+    ]
+  },
+  {
+    id: "return", emoji: "🛍", title: "到店裡退貨", en: "Returning an Item",
+    situation: "你上週買的外套太小，拿回店裡想退貨。",
+    lines: [
+      { who: "them", name: "Staff", en: "Hi, how can I help you?", zh: "你好，有什麼可以幫你的嗎？" },
+      { who: "you", zh: "說你想退這件外套。", options: [
+        { en: "Hi, I'd like to return this jacket.", ok: true },
+        { en: "Hi, I want return this jacket.", why: "want 後面要加 to：want to return（更禮貌是 I'd like to）。" },
+        { en: "This jacket is bad. Money back.", why: "太衝也不完整，店員會覺得你在找麻煩。" }
+      ] },
+      { who: "them", name: "Staff", en: "Sure. Is there a problem with it?", zh: "好的。這件有什麼問題嗎？" },
+      { who: "you", zh: "說它太小了。", options: [
+        { en: "It's too small for me.", ok: true },
+        { en: "It's too much small for me.", why: "too 後面直接加形容詞：too small，不加 much。" },
+        { en: "I'm too small.", why: "意思變成「我太小了」；是外套太小：It's too small。" }
+      ] },
+      { who: "them", name: "Staff", en: "Do you have the receipt?", zh: "你有收據嗎？" },
+      { who: "you", zh: "說有，在這裡，你上週買的。", options: [
+        { en: "Yes, here it is. I bought it last week.", ok: true },
+        { en: "Yes, here it is. I buy it last week.", why: "last week 要用過去式 bought。" },
+        { en: "Yes, here is it.", why: "語序要說 here it is。" }
+      ] },
+      { who: "them", name: "Staff", en: "Thanks. Would you like a refund or a different size?", zh: "謝謝。你要退款還是換別的尺寸？" },
+      { who: "you", zh: "說你想換大一號的。", options: [
+        { en: "I'd like a bigger size, please.", ok: true },
+        { en: "I'd like a more big size, please.", why: "big 的比較級是 bigger，不說 more big。" },
+        { en: "Whatever.", why: "很不禮貌，像是不在乎。" }
+      ] },
+      { who: "them", name: "Staff", en: "No problem. I'll get one for you.", zh: "沒問題，我去幫你拿。" }
+    ]
+  },
+  {
+    id: "directions", emoji: "🗺", title: "問路", en: "Asking for Directions",
+    situation: "你在國外找不到捷運站，想問路人。",
+    lines: [
+      { who: "them", name: "Stranger", en: "Hi there. Are you okay? You look lost.", zh: "嗨，你還好嗎？你看起來迷路了。" },
+      { who: "you", zh: "說不好意思，問最近的捷運站在哪裡。", options: [
+        { en: "Excuse me, where is the nearest subway station?", ok: true },
+        { en: "Excuse me, where the nearest subway station is?", why: "直接問的時候要倒裝：where is the station?" },
+        { en: "Subway. Where.", why: "太簡短，聽起來沒禮貌。" }
+      ] },
+      { who: "them", name: "Stranger", en: "Go straight and turn left at the bank. It's on your right.", zh: "直走，在銀行左轉，它就在你右手邊。" },
+      { who: "you", zh: "確認：在銀行左轉，對嗎？", options: [
+        { en: "Turn left at the bank, right?", ok: true },
+        { en: "Turn left in the bank, right?", why: "在某個地點轉彎用 at the bank；in the bank 是「在銀行裡面」。" },
+        { en: "Turn right at the bank?", why: "對方說的是左轉（left），你聽錯了。" }
+      ] },
+      { who: "them", name: "Stranger", en: "That's right. It takes about five minutes.", zh: "對。走路大概五分鐘。" },
+      { who: "you", zh: "謝謝對方的幫忙。", options: [
+        { en: "Thank you so much for your help!", ok: true },
+        { en: "Thank you so much for your helping!", why: "for your help；help 在這裡是名詞，不加 -ing。" },
+        { en: "Okay.", why: "對方幫你指路，只說 Okay 太冷淡。" }
+      ] },
+      { who: "them", name: "Stranger", en: "You're welcome. Have a nice day!", zh: "不客氣，祝你有美好的一天！" }
+    ]
   }
 ];

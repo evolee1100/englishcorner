@@ -134,7 +134,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 64px; }
 .bar { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
 .bar > i { display: block; height: 100%; border-radius: inherit; background: var(--c1); transition: width .4s; }
 .topic-meta { font-size: 12px; color: var(--muted); font-weight: 700; display: flex; justify-content: space-between; }
-.topic-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.topic-btns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .topic-btns .btn { padding: 9px 6px; font-size: 13px; }
 .btn {
   border: 0; border-radius: 14px; padding: 10px 12px; font-weight: 800; font-size: 14px;
@@ -387,3 +387,56 @@ main { max-width: 1080px; margin: 0 auto; padding: 8px 16px 64px; }
   .bubble .en { font-size: 16px; }
   .tile { font-size: 17px; padding: 7px 11px; }
 }
+
+/* 闖關 */
+.stage-entry { margin: 0 0 22px; }
+.stage-card {
+  width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
+  background: var(--surface); border: 2px solid var(--amber-1); border-radius: 16px; padding: 14px 18px;
+  transition: transform .1s;
+}
+.stage-card:hover { transform: translateY(-1px); }
+.stage-trophy { font-size: 34px; }
+.stage-card .dlg-text b { font-size: 18px; }
+.stage-stars { margin-left: auto; font-weight: 900; font-size: 18px; color: var(--amber-1); white-space: nowrap; }
+.stagemap .sec-desc { margin: 4px 4px 16px; }
+.stage-group { --c1: var(--lc1); margin-bottom: 18px; }
+.stage-group h3 { margin: 0 0 8px; font-size: 15px; font-weight: 900; color: var(--c1); }
+.stage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
+.stage-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 14px;
+}
+.stage-btn b { font-size: 22px; font-weight: 900; }
+.stage-btn .stars { font-size: 13px; color: var(--amber-1); letter-spacing: 1px; }
+.stage-btn:hover:not(:disabled) { border-color: var(--c1); }
+.stage-btn.cleared { border-color: color-mix(in srgb, var(--c1) 50%, var(--line)); }
+.stage-btn.locked { opacity: .45; cursor: not-allowed; }
+.pill.lives { letter-spacing: 1px; }
+.result-stars { font-size: 40px; color: var(--amber-1); letter-spacing: 6px; margin: 4px 0 8px; }
+
+/* 開口說 */
+.say-target { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 760px; margin: 0 auto 14px; }
+.say-word {
+  border: 0; background: var(--surface-2); border-radius: 10px; padding: 6px 10px;
+  font-size: clamp(20px, 3.4vw, 28px); font-weight: 900; color: var(--text);
+}
+.say-word.right { background: color-mix(in srgb, var(--ok) 16%, var(--surface)); color: var(--ok); }
+.say-word.wrong { background: color-mix(in srgb, var(--bad) 14%, var(--surface)); color: var(--bad); }
+.mic-row { display: flex; justify-content: center; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+.mic {
+  width: 84px; height: 84px; border-radius: 50%; border: 0; display: grid; place-items: center;
+  background: var(--c1); color: #fff; font-size: 34px; box-shadow: 0 6px 18px -8px var(--c1);
+}
+.mic.on { background: var(--bad); animation: micpulse 1.2s infinite; font-size: 26px; }
+@keyframes micpulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--bad) 45%, transparent); } 50% { box-shadow: 0 0 0 14px transparent; } }
+.heard { text-align: center; color: var(--muted); font-weight: 700; font-size: 15px; min-height: 22px; }
+.heard b { display: block; color: var(--text); font-size: 18px; margin-top: 4px; }
+.say-score { text-align: center; font-weight: 900; color: var(--bad); margin-top: 6px; }
+.say-score.ok { color: var(--ok); }
+.tool.inline { padding: 3px 10px; font-size: 13px; margin-left: 6px; }
+.chat .your-turn .heard { text-align: center; }
+.bubble .heard-small { display: block; font-size: 12px; opacity: .85; margin-top: 4px; font-weight: 600; }
+.opt.read { cursor: default; grid-template-columns: 24px 1fr auto; }
+.opt.read .say { border: 0; background: none; font-size: 16px; }
+.opt.read .why { grid-column: 2 / 4; }
